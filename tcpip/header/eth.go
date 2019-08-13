@@ -1,6 +1,8 @@
 package header
 
 import (
+	"encoding/binary"
+
 	"github.com/brewlin/net-protocol/tcpip"
 )
 
@@ -30,3 +32,25 @@ const (
 	//EthernetAddressSize 以太网地址的长度
 	EthernetAddressSize = 6
 )
+
+//SourceAddress 从帧投不中得到源地址
+func (b Ethernet) SourceAddress() tcpip.LinkAddress {
+	return tcpip.LinkAddress(b[srcMAC:][:EthernetAddressSize])
+}
+
+//DestinationAddress 从帧 头部中得到目的地址
+func (b Ethernet) DestinationAddress() tcpip.LinkAddress {
+	return tcpip.LinkAddress(b[dstMAC:][:EthernetAddressSize])
+}
+
+//Type 从帧头部中得到协议类型
+func (b Ethernet) Type() tcpip.NetworkProtocolNumber {
+	return tcpip.NetworkProtocolNumber(binary.BigEndian.Uint16(b[ethType:]))
+}
+
+//Encode 根据传入的帧头部信息编码成Ethernet二进制形式，注意Ethernet应先分配好内存
+func (b Ethernet) Encode(e *EthernetFields) {
+	binary.BigEndian.PutUint16(b[ethType:], uint16(e.Type))
+	copy(b[srcMAC:][:EthernetAddressSize], e.SrcAddr)
+	copy(b[dstMAC:][:EthernetAddressSize], e.DstAddr)
+}

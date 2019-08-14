@@ -135,8 +135,94 @@ func (e *endpoint)WritePacket(r *stack.Route,hdr buffer.Prependable,payload buff
 	}
 
 	//如果路由信息中有配置源mac地址，则使用，否则使用本网卡地址
+	if r.LocalAddress != "" {
+		ethHdr.SrcAddr = r.LocalAddress
+	}else {
+		ethHdr.SrcAddr = e.addr
+	}
+	eth.Encode(ethHdr)
+
+	//写入网卡中
+	if payload.Size() == 0 {
+		return rawfile.NonBlockingWrite(e.fd,hdr.View())
+	}
+	return rawfile.NonBlockingWrite2(e.fd,hdr.View(),payload.ToView())
 }
 
+func (e *endpoint)capViews(n int,buffers []int)int {
+	c := 0
+	for i,s := range buffers {
+		c += s
+		if c >= n{
+			e.views[i].CapLength(s - (c - n ))
+			return i + 1
+		}
+	}
+	return len(buffers)
+}
 
+//按bufconfig的长度分配内存大小  注意 e.views 和 e.iovecs 共用相同的内存块
+func (e *endpoint)allocateViews(bufConfig []int){
+	for i , v := range e.views {
+		if v != nil {
+			break
+		}
+		b := buffer.NewView(bufConfig[i])
+		e.views[i] = b
+		e.iovecs[i] = syscall.Iovec{
+			Base:&b[0],
+			Len:uint64(len(b)),
+		}
+	}
+}
+
+//从网卡中读取一个数据报
+func (e *endpoint)dispatch()(bool,*tcpip.Error){
+	//读取数据缓存的分配
+	e.allocateViews(BufConfig)
+	//从网卡中读取数据
+	n,err := rawfile.BlockingReadv(e.fd,e.iovecs)
+	if err != nil {
+		return false,err
+	}
+	//如果比头部长度还小，直接丢弃
+	if n <= e.hdrSize {
+		return false,nil
+	}
+	var (
+		p tcpip.NetworkProtocolNumber
+		remoteLinkAddr,localLinkAddr tcpip.LinkAddress
+	)
+	//获取以太网头部信息
+	eth := header.Ethernet(e.views[0])
+	p = eth.Type()
+	remoteLinkAddr = eth.SourceAddress()
+	localLinkAddr = eth.DestinationAddress()
+
+	used := e.capViews(n,BufConfig)
+	vv := buffer.NewVectorisedView(n,e.views[:used])
+	//将数据内容删除以太网头部信息，也就是将数据指针指向网络层第一个字节
+	vv.TrimFront(e.hdrSize)
+	//调用nic.delivernetworkpacket来分发网络层数据
+	e.dispatcher.DeliverNetworkPacket(e,remoteLinkAddr,localLinkAddr,p,vv)
+	
+	for i:= 0; i < used; i++ {
+		e.views[i] = nil
+	}
+	return true,nil
+}
+
+//循环从fd读取数据，然后将数据包分发给协议栈
+func (e *endpoint)dispatchLoop()*tcpip.Error{
+	for {
+		cont, err := e.dispatch()
+		if err != nil || !cont {
+			if e.closed != nil {
+				e.closed(err)
+			}
+			return err
+		}
+	}
+}
 
 

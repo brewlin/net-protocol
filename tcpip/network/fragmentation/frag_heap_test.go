@@ -19,7 +19,7 @@ import (
 	"reflect"
 	"testing"
 
-	"netstack/tcpip/buffer"
+	"github.com/brewlin/net-protocol/tcpip/buffer"
 )
 
 var reassambleTestCases = []struct {

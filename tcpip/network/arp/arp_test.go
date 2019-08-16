@@ -18,15 +18,15 @@ import (
 	"testing"
 	"time"
 
-	"netstack/tcpip"
-	"netstack/tcpip/buffer"
-	"netstack/tcpip/header"
-	"netstack/tcpip/link/channel"
-	"netstack/tcpip/link/sniffer"
-	"netstack/tcpip/network/arp"
-	"netstack/tcpip/network/ipv4"
-	"netstack/tcpip/stack"
-	"netstack/tcpip/transport/ping"
+	"github.com/brewlin/net-protocol/tcpip"
+	"github.com/brewlin/net-protocol/tcpip/buffer"
+	"github.com/brewlin/net-protocol/tcpip/header"
+	"github.com/brewlin/net-protocol/tcpip/link/channel"
+	"github.com/brewlin/net-protocol/tcpip/link/sniffer"
+	"github.com/brewlin/net-protocol/tcpip/network/arp"
+	"github.com/brewlin/net-protocol/tcpip/network/ipv4"
+	"github.com/brewlin/net-protocol/stack"
+	"github.com/brewlin/net-protocol/tcpip/transport/ping"
 )
 
 const (

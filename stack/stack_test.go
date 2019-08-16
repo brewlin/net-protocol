@@ -22,10 +22,10 @@ import (
 	"strings"
 	"testing"
 
-	"netstack/tcpip"
-	"netstack/tcpip/buffer"
-	"netstack/tcpip/link/channel"
-	"netstack/tcpip/stack"
+	"github.com/brewlin/net-protocol/tcpip"
+	"github.com/brewlin/net-protocol/tcpip/buffer"
+	"github.com/brewlin/net-protocol/tcpip/link/channel"
+	"github.com/brewlin/net-protocol/stack"
 )
 
 const (

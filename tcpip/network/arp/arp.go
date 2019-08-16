@@ -89,6 +89,7 @@ func (e *endpoint) WritePacket(r *stack.Route, hdr buffer.Prependable, payload b
 
 // arp数据包的处理，包括arp请求和响应
 func (e *endpoint) HandlePacket(r *stack.Route, vv buffer.VectorisedView) {
+	log.Println("@arp step1 : 解析arp数据包，包括arp请求和响应")
 	v := vv.First()
 	h := header.ARP(v)
 	if !h.IsValid() {
@@ -99,14 +100,14 @@ func (e *endpoint) HandlePacket(r *stack.Route, vv buffer.VectorisedView) {
 	switch h.Op() {
 	case header.ARPRequest:
 		// 如果是arp请求
-		log.Printf("recv arp request")
+		log.Println("@arp step2 : 解析arp请求")
 		localAddr := tcpip.Address(h.ProtocolAddressTarget())
 		if e.linkAddrCache.CheckLocalAddress(e.nicid, header.IPv4ProtocolNumber, localAddr) == 0 {
 			return // we have no useful answer, ignore the request
 		}
 		hdr := buffer.NewPrependable(int(e.linkEP.MaxHeaderLength()) + header.ARPSize)
 		pkt := header.ARP(hdr.Prepend(header.ARPSize))
-		pkt.SetIPv4OverEthernet()
+		pkt.SetIpv4OverEthernet()
 		pkt.SetOp(header.ARPReply)
 		copy(pkt.HardwareAddressSender(), r.LocalLinkAddress[:])
 		copy(pkt.ProtocolAddressSender(), h.ProtocolAddressTarget())
@@ -162,7 +163,7 @@ func (*protocol) LinkAddressRequest(addr, localAddr tcpip.Address, linkEP stack.
 
 	hdr := buffer.NewPrependable(int(linkEP.MaxHeaderLength()) + header.ARPSize)
 	h := header.ARP(hdr.Prepend(header.ARPSize))
-	h.SetIPv4OverEthernet()
+	h.SetIpv4OverEthernet()
 	h.SetOp(header.ARPRequest)
 	copy(h.HardwareAddressSender(), linkEP.LinkAddress())
 	copy(h.ProtocolAddressSender(), localAddr)

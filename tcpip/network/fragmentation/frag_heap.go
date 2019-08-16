@@ -18,7 +18,7 @@ import (
 	"container/heap"
 	"fmt"
 
-	"netstack/tcpip/buffer"
+	"github.com/brewlin/net-protocol/tcpip/buffer"
 )
 
 type fragment struct {

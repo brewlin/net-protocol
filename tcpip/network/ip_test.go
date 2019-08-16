@@ -17,15 +17,15 @@ package ip_test
 import (
 	"testing"
 
-	"netstack/tcpip"
-	"netstack/tcpip/buffer"
-	"netstack/tcpip/header"
-	"netstack/tcpip/link/loopback"
-	"netstack/tcpip/network/ipv4"
-	"netstack/tcpip/network/ipv6"
-	"netstack/tcpip/stack"
-	"netstack/tcpip/transport/tcp"
-	"netstack/tcpip/transport/udp"
+	"github.com/brewlin/net-protocol/tcpip"
+	"github.com/brewlin/net-protocol/tcpip/buffer"
+	"github.com/brewlin/net-protocol/tcpip/header"
+	"github.com/brewlin/net-protocol/tcpip/link/loopback"
+	"github.com/brewlin/net-protocol/tcpip/network/ipv4"
+	"github.com/brewlin/net-protocol/tcpip/network/ipv6"
+	"github.com/brewlin/net-protocol/stack"
+	"github.com/brewlin/net-protocol/tcpip/transport/tcp"
+	"github.com/brewlin/net-protocol/tcpip/transport/udp"
 )
 
 const (

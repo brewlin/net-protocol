@@ -19,7 +19,7 @@ import (
 	"testing"
 	"time"
 
-	"netstack/tcpip/buffer"
+	"github.com/brewlin/net-protocol/tcpip/buffer"
 )
 
 // vv is a helper to build VectorisedView from different strings.

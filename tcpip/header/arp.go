@@ -32,7 +32,7 @@ func (a ARP) hardwareAddressSpace() uint16 {
 }
 
 //从报文中得到协议类型
-func (a ARP) protocolAddressSpache() uint16 {
+func (a ARP) protocolAddressSpace() uint16 {
 	return uint16(a[2])<<8 | uint16(a[3])
 }
 
@@ -78,7 +78,7 @@ func (a ARP) ProtocolAddressSender() []byte {
 }
 
 //HardwareAddressTarget从报文中得到arp目的方硬件地址
-func HardwareAddressTarget() []byte {
+func (a ARP) HardwareAddressTarget() []byte {
 	const s = 8 + 6 + 4
 	return a[s : s+6]
 }
@@ -98,5 +98,5 @@ func (a ARP) IsValid() bool {
 	const htypeEthernet = 1
 	const macSize = 6
 	//是否以太网，ipv4，硬件和协议长度都对
-	return a.hardwareAddressSpace() == htypeEthernet && a.protocolAddressSpace() == uint16(IPv4ProtocolNumber) && a.hardwareAddressSize() == macSize && a.protocolAddressSize == IPv4AddressSize
+	return a.hardwareAddressSpace() == htypeEthernet && a.protocolAddressSpace() == uint16(IPv4ProtocolNumber) && a.hardwareAddressSize() == macSize && a.protocolAddressSize() == IPv4AddressSize
 }

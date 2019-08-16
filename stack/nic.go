@@ -15,6 +15,7 @@
 package stack
 
 import (
+	"log"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -220,11 +221,12 @@ func (n *NIC) findEndpoint(protocol tcpip.NetworkProtocolNumber, address tcpip.A
 
 // 在NIC上添加addr地址，注册和初始化网络层协议
 // 相当于给网卡添加ip地址
-func (n *NIC) addAddressLocked(protocol tcpip.NetworkProtocolNumber, addr tcpip.Address,
-	peb PrimaryEndpointBehavior, replace bool) (*referencedNetworkEndpoint, *tcpip.Error) {
+func (n *NIC) addAddressLocked(protocol tcpip.NetworkProtocolNumber, addr tcpip.Address, peb PrimaryEndpointBehavior, replace bool) (*referencedNetworkEndpoint, *tcpip.Error) {
+	log.Println("@nic 在nic网卡上添加网络层，注册和初始化网络协议 ", "protocol:", protocol, " addr:", addr, " peb:", peb)
 	// 查看是否支持该协议，若不支持则返回错误
 	netProto, ok := n.stack.networkProtocols[protocol]
 	if !ok {
+		log.Println("@nic 不支持该网络层协议 ", "protocol:", protocol, " addr:", addr, " peb:", peb)
 		return nil, tcpip.ErrUnknownProtocol
 	}
 
@@ -426,8 +428,8 @@ func (n *NIC) RemoveAddress(addr tcpip.Address) *tcpip.Error {
 // DeliverNetworkPacket 找到适当的网络协议端点并将数据包交给它进一步处理。
 // 当NIC从物理接口接收数据包时，将调用此函数。比如protocol是arp协议号， 那么会找到arp.HandlePacket来处理数据报。
 // protocol是ipv4协议号， 那么会找到ipv4.HandlePacket来处理数据报。
-func (n *NIC) DeliverNetworkPacket(linkEP LinkEndpoint, remoteLinkAddr, localLinkAddr tcpip.LinkAddress,
-	protocol tcpip.NetworkProtocolNumber, vv buffer.VectorisedView) {
+func (n *NIC) DeliverNetworkPacket(linkEP LinkEndpoint, remoteLinkAddr, localLinkAddr tcpip.LinkAddress, protocol tcpip.NetworkProtocolNumber, vv buffer.VectorisedView) {
+	log.Println("@step3 nic网卡解析以太网协议,分发到对应的 网络层 协议处理 ")
 	netProto, ok := n.stack.networkProtocols[protocol]
 	if !ok {
 		n.stack.stats.UnknownProtocolRcvdPackets.Increment()

@@ -18,8 +18,9 @@ package hash
 import (
 	"encoding/binary"
 
-	"netstack/rand"
-	"netstack/tcpip/header"
+	"github.com/brewlin/net-protocol/tcpip/header"
+
+	"github.com/brewlin/net-protocol/rand"
 )
 
 var hashIV = RandN32(1)[0]

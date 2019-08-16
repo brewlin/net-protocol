@@ -17,10 +17,10 @@ package ipv6
 import (
 	"encoding/binary"
 
-	"netstack/tcpip"
-	"netstack/tcpip/buffer"
-	"netstack/tcpip/header"
-	"netstack/tcpip/stack"
+	"github.com/brewlin/net-protocol/tcpip"
+	"github.com/brewlin/net-protocol/tcpip/buffer"
+	"github.com/brewlin/net-protocol/tcpip/header"
+	"github.com/brewlin/net-protocol/stack"
 )
 
 // handleControl handles the case when an ICMP packet contains the headers of

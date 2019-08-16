@@ -16,7 +16,7 @@ package rawfile
 
 // +build linux
 
-// Package rawfile contains utilities for using the netstack with raw host
+// Package rawfile contains utilities for using the github.com/brewlin/net-protocol with raw host
 // files on Linux hosts.
 
 import (

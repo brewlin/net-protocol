@@ -64,6 +64,8 @@ func main() {
 
 	//获取mac地址
 	mac, err := tuntap.GetHardwareAddr(tapName)
+	log.Println("get mac addr:", string(mac))
+
 	if err != nil {
 		panic(err)
 	}
@@ -78,7 +80,8 @@ func main() {
 	s := stack.New([]string{ipv4.ProtocolName, arp.ProtocolName}, []string{}, stack.Options{})
 
 	//新建抽象的网卡
-	if err := s.CreateDisabledNIC(1, "vnic1", linkID); err != nil {
+	// if err := s.CreateNamedNIC(1, "vnic1", linkID); err != nil {
+	if err := s.CreateNamedNIC(1, "vnic1", linkID); err != nil {
 		log.Fatal(err)
 	}
 	//在该协议栈上添加和注册相应的网络层

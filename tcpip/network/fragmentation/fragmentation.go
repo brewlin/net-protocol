@@ -21,7 +21,7 @@ import (
 	"sync"
 	"time"
 
-	"netstack/tcpip/buffer"
+	"github.com/brewlin/net-protocol/tcpip/buffer"
 )
 
 // DefaultReassembleTimeout is based on the linux stack: net.ipv4.ipfrag_time.

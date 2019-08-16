@@ -18,10 +18,11 @@ import (
 	"encoding/binary"
 	"log"
 
-	"netstack/tcpip"
-	"netstack/tcpip/buffer"
-	"netstack/tcpip/header"
-	"netstack/tcpip/stack"
+	"github.com/brewlin/net-protocol/stack"
+	"github.com/brewlin/net-protocol/tcpip/buffer"
+	"github.com/brewlin/net-protocol/tcpip/header"
+
+	"github.com/brewlin/net-protocol/tcpip"
 )
 
 // handleControl handles the case when an ICMP packet contains the headers of

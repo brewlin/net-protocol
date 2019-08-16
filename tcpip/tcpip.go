@@ -42,7 +42,7 @@ import (
 	"github.com/brewlin/net-protocol/waiter"
 )
 
-// Error represents an error in the netstack error space. Using a special type
+// Error represents an error in the github.com/brewlin/net-protocol error space. Using a special type
 // ensures that errors outside of this space are not accidentally introduced.
 //
 // Note: to support save / restore, it is important that all tcpip errors have
@@ -122,7 +122,7 @@ func (e ErrSaveRejection) Error() string {
 // A Clock provides the current time.
 //
 // Times returned by a Clock should always be used for application-visible
-// time, but never for netstack internal timekeeping.
+// time, but never for github.com/brewlin/net-protocol internal timekeeping.
 type Clock interface {
 	// NowNanoseconds returns the current real time as a number of
 	// nanoseconds since the Unix epoch.

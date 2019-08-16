@@ -25,6 +25,7 @@
 package stack
 
 import (
+	"log"
 	"sync"
 	"time"
 
@@ -502,6 +503,7 @@ func (s *Stack) NewEndpoint(transport tcpip.TransportProtocolNumber, network tcp
 // optionally enable it.
 // 新建一个网卡对象，并且激活它，激活的意思就是准备好从网卡中读取和写入数据。
 func (s *Stack) createNIC(id tcpip.NICID, name string, linkEP tcpip.LinkEndpointID, enabled bool) *tcpip.Error {
+	log.Println("@createnic 新建网卡对象,并启动网卡事件")
 	ep := FindLinkEndpoint(linkEP)
 	if ep == nil {
 		return tcpip.ErrBadLinkEndpoint
@@ -540,7 +542,7 @@ func (s *Stack) CreateNamedNIC(id tcpip.NICID, name string, linkEP tcpip.LinkEnd
 // CreateDisabledNIC creates a NIC with the provided id and link-layer endpoint,
 // but leave it disable. Stack.EnableNIC must be called before the link-layer
 // endpoint starts delivering packets to it.
-func (s *Stack) CreateDisabledNIC(id tcpip.NICID, linkEP tcpip.LinkEndpointID) *tcpip.Error {
+func (s *Stack) CreateDisabledNIC(id tcpip.NICID, name string, linkEP tcpip.LinkEndpointID) *tcpip.Error {
 	return s.createNIC(id, "", linkEP, false)
 }
 
@@ -600,7 +602,7 @@ func (s *Stack) NICInfo() map[tcpip.NICID]NICInfo {
 	nics := make(map[tcpip.NICID]NICInfo)
 	for id, nic := range s.nics {
 		flags := NICStateFlags{
-			Up:          true, // Netstack interfaces are always up.
+			Up:          true, // github.com/brewlin/net-protocol interfaces are always up.
 			Running:     nic.linkEP.IsAttached(),
 			Promiscuous: nic.isPromiscuousMode(),
 			Loopback:    nic.linkEP.Capabilities()&CapabilityLoopback != 0,
@@ -769,8 +771,10 @@ func (s *Stack) CheckNetworkProtocol(protocol tcpip.NetworkProtocolNumber) bool 
 // CheckLocalAddress determines if the given local address exists, and if it
 // does, returns the id of the NIC it's bound to. Returns 0 if the address
 // does not exist.
+//nicid 网卡id   protocol 协议号[arp|ipv4|...] 通过以太网协议第12-14字节获得  addr 地址
 func (s *Stack) CheckLocalAddress(nicid tcpip.NICID, protocol tcpip.NetworkProtocolNumber, addr tcpip.Address) tcpip.NICID {
 	s.mu.RLock()
+	log.Println("@stack 协议解析 nicid:", nicid, " protocol:", protocol, " addr:", addr)
 	defer s.mu.RUnlock()
 
 	// If a NIC is specified, we try to find the address there only.

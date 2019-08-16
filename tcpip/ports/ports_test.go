@@ -17,7 +17,7 @@ package ports
 import (
 	"testing"
 
-	"netstack/tcpip"
+	"github.com/brewlin/net-protocol/tcpip"
 )
 
 const (

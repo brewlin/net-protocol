@@ -21,10 +21,10 @@
 package ipv6
 
 import (
-	"netstack/tcpip"
-	"netstack/tcpip/buffer"
-	"netstack/tcpip/header"
-	"netstack/tcpip/stack"
+	"github.com/brewlin/net-protocol/tcpip"
+	"github.com/brewlin/net-protocol/tcpip/buffer"
+	"github.com/brewlin/net-protocol/tcpip/header"
+	"github.com/brewlin/net-protocol/stack"
 )
 
 const (
@@ -39,7 +39,7 @@ const (
 	maxPayloadSize = 0xffff
 
 	// defaultIPv6HopLimit is the default hop limit for IPv6 Packets
-	// egressed by Netstack.
+	// egressed by github.com/brewlin/net-protocol.
 	defaultIPv6HopLimit = 255
 )
 

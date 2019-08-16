@@ -20,8 +20,8 @@ import (
 	"testing"
 	"time"
 
-	"netstack/sleep"
-	"netstack/tcpip"
+	"github.com/brewlin/net-protocol/sleep"
+	"github.com/brewlin/net-protocol/tcpip"
 )
 
 type testaddr struct {

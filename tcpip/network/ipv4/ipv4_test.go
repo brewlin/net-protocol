@@ -17,14 +17,14 @@ package ipv4_test
 import (
 	"testing"
 
-	"netstack/tcpip"
-	"netstack/tcpip/header"
-	"netstack/tcpip/link/channel"
-	"netstack/tcpip/link/sniffer"
-	"netstack/tcpip/network/ipv4"
-	"netstack/tcpip/stack"
-	"netstack/tcpip/transport/udp"
-	"netstack/waiter"
+	"github.com/brewlin/net-protocol/tcpip"
+	"github.com/brewlin/net-protocol/tcpip/header"
+	"github.com/brewlin/net-protocol/tcpip/link/channel"
+	"github.com/brewlin/net-protocol/tcpip/link/sniffer"
+	"github.com/brewlin/net-protocol/tcpip/network/ipv4"
+	"github.com/brewlin/net-protocol/stack"
+	"github.com/brewlin/net-protocol/tcpip/transport/udp"
+	"github.com/brewlin/net-protocol/waiter"
 )
 
 func TestExcludeBroadcast(t *testing.T) {

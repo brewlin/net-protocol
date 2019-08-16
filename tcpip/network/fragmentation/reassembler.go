@@ -21,7 +21,7 @@ import (
 	"sync"
 	"time"
 
-	"netstack/tcpip/buffer"
+	"github.com/brewlin/net-protocol/tcpip/buffer"
 )
 
 type hole struct {

@@ -148,7 +148,7 @@ func (e *endpoint) WritePacket(r *stack.Route, hdr buffer.Prependable, payload b
 	r.Stats().IP.PacketsSent.Increment()
 
 	// 写入网卡接口
-	log.Printf("send ipv4 packet %d bytes, proto: 0x%x", hdr.UsedLength()+payload.Size(), protocol)
+	log.Printf("@ipv4 封装ipv4协议：  调用网卡写入接口写入数据 send ipv4 packet %d bytes, proto: 0x%x", hdr.UsedLength()+payload.Size(), protocol)
 	return e.linkEP.WritePacket(r, hdr, payload, ProtocolNumber)
 }
 

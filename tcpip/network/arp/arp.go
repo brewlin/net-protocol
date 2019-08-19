@@ -112,7 +112,7 @@ func (e *endpoint) HandlePacket(r *stack.Route, vv buffer.VectorisedView) {
 		copy(pkt.HardwareAddressSender(), r.LocalLinkAddress[:])
 		copy(pkt.ProtocolAddressSender(), h.ProtocolAddressTarget())
 		copy(pkt.ProtocolAddressTarget(), h.ProtocolAddressSender())
-		log.Printf("send arp reply")
+		log.Println("@arp reply: 发送arp回复")
 		e.linkEP.WritePacket(r, hdr, buffer.VectorisedView{}, ProtocolNumber)
 		// 注意这里的 fallthrough 表示需要继续执行下面分支的代码
 		// 当收到 arp 请求需要添加到链路地址缓存中

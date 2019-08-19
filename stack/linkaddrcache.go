@@ -149,7 +149,7 @@ func (e *linkAddrEntry) removeWaker(w *sleep.Waker) {
 
 // add adds a k -> v mapping to the cache.
 func (c *linkAddrCache) add(k tcpip.FullAddress, v tcpip.LinkAddress) {
-	log.Printf("add link cache: %v-%v", k, v)
+	log.Printf("@linkaddrcache : 路由表缓存 %v-%v", k, v)
 	c.mu.Lock()
 	defer c.mu.Unlock()
 

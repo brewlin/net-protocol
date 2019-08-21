@@ -67,7 +67,7 @@ func (e *endpoint) handleICMP(r *stack.Route, vv buffer.VectorisedView) {
 	}
 	h := header.ICMPv4(v)
 
-	// 更具icmp的类型来进行相应的处理
+	// 根据icmp的类型来进行相应的处理
 	switch h.Type() {
 	case header.ICMPv4Echo: // icmp echo请求
 		if len(v) < header.ICMPv4EchoMinimumSize {

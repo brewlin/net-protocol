@@ -148,7 +148,7 @@ func (e *endpoint) WritePacket(r *stack.Route, hdr buffer.Prependable, payload b
 	r.Stats().IP.PacketsSent.Increment()
 
 	// 写入网卡接口
-	log.Printf("@ipv4 封装ipv4协议：  调用网卡写入接口写入数据 send ipv4 packet %d bytes, proto: 0x%x", hdr.UsedLength()+payload.Size(), protocol)
+	log.Printf("@网络层 ipv4: 接受传输层数据 封装ip头部信息，写入链路层网卡数据 send ipv4 packet %d bytes, proto: 0x%x", hdr.UsedLength()+payload.Size(), protocol)
 	return e.linkEP.WritePacket(r, hdr, payload, ProtocolNumber)
 }
 
@@ -156,6 +156,7 @@ func (e *endpoint) WritePacket(r *stack.Route, hdr buffer.Prependable, payload b
 // this endpoint.
 // 收到ip包的处理
 func (e *endpoint) HandlePacket(r *stack.Route, vv buffer.VectorisedView) {
+	log.Println("@网络层 ipv4: handlePacket 数据包处理")
 	// 得到ip报文
 	h := header.IPv4(vv.First())
 	// 检查报文是否有效
@@ -168,10 +169,11 @@ func (e *endpoint) HandlePacket(r *stack.Route, vv buffer.VectorisedView) {
 	vv.TrimFront(hlen)
 	vv.CapLength(tlen - hlen)
 
-	// 检查ip报文是否有更多的分片
+	// 检查ip报文是否有更多的分片  mf  = 0 表示为最后一个分片
 	more := (h.Flags() & header.IPv4FlagMoreFragments) != 0
 	// 是否需要ip重组
 	if more || h.FragmentOffset() != 0 {
+		//需要继续接受更多分片 在进行重组
 		// The packet is a fragment, let's try to reassemble it.
 		last := h.FragmentOffset() + uint16(vv.Size()) - 1
 		var ready bool
@@ -190,7 +192,7 @@ func (e *endpoint) HandlePacket(r *stack.Route, vv buffer.VectorisedView) {
 	}
 	r.Stats().IP.PacketsDelivered.Increment()
 	// 根据协议分发到不通处理函数，比如协议时TCP，会进入tcp.HandlePacket
-	log.Printf("recv ipv4 packet %d bytes, proto: 0x%x", tlen, p)
+	log.Printf("@网络层 ipv4: handlePacket 分发协议处理，recv ipv4 packet %d bytes, proto: 0x%x", tlen, p)
 	e.dispatcher.DeliverTransportPacket(r, p, vv)
 }
 

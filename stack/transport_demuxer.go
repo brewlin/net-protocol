@@ -17,9 +17,9 @@ package stack
 import (
 	"sync"
 
-	"github.com/brewlin/net-protocol/tcpip"
-	"github.com/brewlin/net-protocol/tcpip/buffer"
-	"github.com/brewlin/net-protocol/tcpip/header"
+	"github.com/brewlin/net-protocol"
+	"github.com/brewlin/net-protocol/buffer"
+	"github.com/brewlin/net-protocol/header"
 )
 
 // 网络层协议号和传输层协议号的组合，当作分流器的key值

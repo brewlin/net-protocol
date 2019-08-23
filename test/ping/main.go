@@ -8,12 +8,12 @@ import (
 	"strings"
 
 	"github.com/brewlin/net-protocol/stack"
-	"github.com/brewlin/net-protocol/tcpip"
-	"github.com/brewlin/net-protocol/tcpip/link/fdbased"
-	"github.com/brewlin/net-protocol/tcpip/link/tuntap"
-	"github.com/brewlin/net-protocol/tcpip/network/arp"
-	"github.com/brewlin/net-protocol/tcpip/network/ipv4"
-	"github.com/brewlin/net-protocol/tcpip/network/ipv6"
+	"github.com/brewlin/net-protocol"
+	"github.com/brewlin/net-protocol/link/fdbased"
+	"github.com/brewlin/net-protocol/link/tuntap"
+	"github.com/brewlin/net-protocol/network/arp"
+	"github.com/brewlin/net-protocol/network/ipv4"
+	"github.com/brewlin/net-protocol/network/ipv6"
 )
 
 func main() {

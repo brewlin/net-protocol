@@ -22,9 +22,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/brewlin/net-protocol/tcpip"
-	"github.com/brewlin/net-protocol/tcpip/buffer"
-	"github.com/brewlin/net-protocol/tcpip/link/channel"
+	"github.com/brewlin/net-protocol"
+	"github.com/brewlin/net-protocol/buffer"
+	"github.com/brewlin/net-protocol/link/channel"
 	"github.com/brewlin/net-protocol/stack"
 )
 

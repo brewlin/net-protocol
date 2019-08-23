@@ -21,9 +21,9 @@ import (
 	"sync/atomic"
 
 	"github.com/brewlin/net-protocol/ilist"
-	"github.com/brewlin/net-protocol/tcpip"
-	"github.com/brewlin/net-protocol/tcpip/buffer"
-	"github.com/brewlin/net-protocol/tcpip/header"
+	"github.com/brewlin/net-protocol"
+	"github.com/brewlin/net-protocol/buffer"
+	"github.com/brewlin/net-protocol/header"
 )
 
 // NIC represents a "network interface card" to which the networking stack is

@@ -32,8 +32,8 @@ import (
 	"github.com/brewlin/net-protocol/sleep"
 	"github.com/brewlin/net-protocol"
 	"github.com/brewlin/net-protocol/buffer"
-	"github.com/brewlin/net-protocol/header"
-	"github.com/brewlin/net-protocol/ports"
+	"github.com/brewlin/net-protocol/protocol/header"
+	"github.com/brewlin/net-protocol/protocol/ports"
 	"github.com/brewlin/net-protocol/seqnum"
 	"github.com/brewlin/net-protocol/waiter"
 )

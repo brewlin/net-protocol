@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/brewlin/net-protocol/link/rawfile"
-	"github.com/brewlin/net-protocol/link/tuntap"
+	"github.com/brewlin/net-protocol/protocol/link/rawfile"
+	"github.com/brewlin/net-protocol/protocol/link/tuntap"
 )
 
 func main() {

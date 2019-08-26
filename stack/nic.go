@@ -23,7 +23,7 @@ import (
 	"github.com/brewlin/net-protocol/ilist"
 	"github.com/brewlin/net-protocol"
 	"github.com/brewlin/net-protocol/buffer"
-	"github.com/brewlin/net-protocol/header"
+	"github.com/brewlin/net-protocol/protocol/header"
 )
 
 // NIC represents a "network interface card" to which the networking stack is

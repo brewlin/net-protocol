@@ -4,11 +4,11 @@ import (
 	"log"
 	"syscall"
 
-	"github.com/brewlin/net-protocol/stack"
-	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/pkg/buffer"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/protocol/header"
 	"github.com/brewlin/net-protocol/protocol/link/rawfile"
+	"github.com/brewlin/net-protocol/stack"
 )
 
 // 从NIC读取数据的多级缓存配置
@@ -137,6 +137,7 @@ func (e *endpoint) WritePacket(r *stack.Route, hdr buffer.Prependable, payload b
 	}
 	eth.Encode(ethHdr)
 
+	log.Println("@link fdbased: 链路层 写入网卡数据 ", hdr.View)
 	//写入网卡中
 	if payload.Size() == 0 {
 		return rawfile.NonBlockingWrite(e.fd, hdr.View())

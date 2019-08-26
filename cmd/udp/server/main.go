@@ -8,15 +8,15 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/brewlin/net-protocol/pkg/waiter"
 	"github.com/brewlin/net-protocol/protocol/link/fdbased"
 	"github.com/brewlin/net-protocol/protocol/link/tuntap"
 	"github.com/brewlin/net-protocol/protocol/network/arp"
 	"github.com/brewlin/net-protocol/protocol/network/ipv4"
 	"github.com/brewlin/net-protocol/protocol/network/ipv6"
-	"github.com/brewlin/net-protocol/stack"
 	"github.com/brewlin/net-protocol/protocol/transport/tcp"
 	"github.com/brewlin/net-protocol/protocol/transport/udp"
-	"github.com/brewlin/net-protocol/pkg/waiter"
+	"github.com/brewlin/net-protocol/stack"
 
 	tcpip "github.com/brewlin/net-protocol/protocol"
 )
@@ -25,23 +25,27 @@ var mac = flag.String("mac", "01:01:01:01:01:01", "mac address to use in tap dev
 
 func main() {
 	flag.Parse()
-	if len(flag.Args()) != 3 {
-		log.Fatal("usage: ", os.Args[0], " < tap-device> <listen-address> port")
+	if len(flag.Args()) != 4 {
+		log.Fatal("usage: ", os.Args[0], " < tap-device> <local-address/mask> <ip-address>")
 	}
 
 	log.SetFlags(log.Lshortfile | log.LstdFlags)
 	tapName := flag.Arg(0)
-	listenAddr := flag.Arg(1)
-	portName := flag.Arg(2)
+	cidrName := flag.Arg(1)
+	addrName := flag.Arg(2)
+	portName := flag.Arg(3)
 
-	log.Printf("tap: %v,listenAddr:%v,portName:%v", tapName, listenAddr, portName)
+	log.Printf("tap: %v,addr:%v,port:%v", tapName, addrName, portName)
 
 	//解析mac地址
 	maddr, err := net.ParseMAC(*mac)
 	if err != nil {
 		log.Fatalf("Bad mac address:%v", *mac)
 	}
-	parseAddr := net.ParseIP(listenAddr)
+	parseAddr := net.ParseIP(addrName)
+	if err != nil {
+		log.Fatalf("bad address:%v", addrName)
+	}
 
 	//解析ip地址，ipv4 或者ipv6
 	var addr tcpip.Address
@@ -75,8 +79,8 @@ func main() {
 	}
 	//启动tap网卡
 	tuntap.SetLinkUp(tapName)
-	//设置tap网卡ip地址
-	tuntap.AddIP(tapName, listenAddr)
+	//设置路由
+	tuntap.SetRoute(tapName, cidrName)
 
 	//抽象网卡的文件接口 实现的接口
 	linkID := fdbased.New(&fdbased.Options{
@@ -111,13 +115,44 @@ func main() {
 			NIC:         1,
 		},
 	})
-	//同时监听tcp和udp localPort端口
-	tcpEp := tcpListen(s, proto, localPort)
-	udpEp := udpListen(s, proto, localPort)
 
-	//关闭监听服务，释放端口
-	tcpEp.Close()
-	udpEp.Close()
+	var wq waiter.Queue
+	//新建一个UDP端
+	ep, e := s.NewEndpoint(udp.ProtocolNumber, proto, &wq)
+	if err != nil {
+		log.Fatal(e)
+	}
+	//绑定本地端口
+	if err := ep.Bind(tcpip.FullAddress{1, addr, uint16(localPort)}, nil); err != nil {
+		log.Fatal("bind failed :", err)
+	}
+	echo(&wq, ep)
+
+}
+func echo(wq *waiter.Queue, ep tcpip.Endpoint) {
+	defer ep.Close()
+	//创建队列 通知 channel
+	waitEntry, notifych := waiter.NewChannelEntry(nil)
+	wq.EventRegister(&waitEntry, waiter.EventIn)
+	defer wq.EventUnregister(&waitEntry)
+
+	var saddr tcpip.FullAddress
+
+	for {
+		v, _, err := ep.Read(&saddr)
+		if err != nil {
+			if err == tcpip.ErrWouldBlock {
+				<-notifych
+				continue
+			}
+			return
+		}
+		log.Printf("read and write data:%s", string(v))
+		_, _, err = ep.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: &saddr})
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 }
 func tcpListen(s *stack.Stack, proto tcpip.NetworkProtocolNumber, localPort int) tcpip.Endpoint {
 	var wq waiter.Queue

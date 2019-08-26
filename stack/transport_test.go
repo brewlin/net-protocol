@@ -17,7 +17,7 @@ package stack_test
 import (
 	"testing"
 
-	"github.com/brewlin/net-protocol"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/pkg/buffer"
 	"github.com/brewlin/net-protocol/link/channel"
 	"github.com/brewlin/net-protocol/stack"

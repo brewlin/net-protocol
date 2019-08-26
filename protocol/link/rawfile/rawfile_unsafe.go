@@ -23,7 +23,7 @@ import (
 	"syscall"
 	"unsafe"
 
-	"github.com/brewlin/net-protocol"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
 // GetMTU determines the MTU of a network interface device.

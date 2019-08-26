@@ -18,7 +18,7 @@ import (
 	"github.com/brewlin/net-protocol/protocol/transport/udp"
 	"github.com/brewlin/net-protocol/pkg/waiter"
 
-	tcpip "github.com/brewlin/net-protocol"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
 var mac = flag.String("mac", "01:01:01:01:01:01", "mac address to use in tap device")

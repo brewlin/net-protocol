@@ -24,7 +24,7 @@ import (
 	"crypto/sha1"
 	"github.com/brewlin/net-protocol/pkg/rand"
 	"github.com/brewlin/net-protocol/pkg/sleep"
-	tcpip "github.com/brewlin/net-protocol"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/protocol/header"
 	"github.com/brewlin/net-protocol/pkg/seqnum"
 	"github.com/brewlin/net-protocol/stack"

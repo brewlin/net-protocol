@@ -17,7 +17,7 @@ package ports
 import (
 	"testing"
 
-	"github.com/brewlin/net-protocol"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
 const (

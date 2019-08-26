@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/brewlin/net-protocol/pkg/sleep"
-	"github.com/brewlin/net-protocol"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
 const linkAddrCacheSize = 512 // max cache entries

@@ -15,7 +15,7 @@
 package header
 
 import (
-	"github.com/brewlin/net-protocol"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
 const (

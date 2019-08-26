@@ -18,7 +18,7 @@ import (
 	"encoding/binary"
 	"strings"
 
-	"github.com/brewlin/net-protocol"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
 const (

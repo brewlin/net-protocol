@@ -16,7 +16,7 @@ package stack
 
 import (
 	"github.com/brewlin/net-protocol/pkg/sleep"
-	"github.com/brewlin/net-protocol"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/pkg/buffer"
 	"github.com/brewlin/net-protocol/protocol/header"
 )

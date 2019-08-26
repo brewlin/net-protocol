@@ -3,7 +3,7 @@ package header
 import (
 	"encoding/binary"
 
-	"github.com/brewlin/net-protocol"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
 //以太网帧头部信息的偏移量

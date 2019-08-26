@@ -17,7 +17,7 @@ package tcp
 import (
 	"sync"
 
-	tcpip "github.com/brewlin/net-protocol"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/pkg/buffer"
 	"github.com/brewlin/net-protocol/protocol/header"
 	"github.com/brewlin/net-protocol/pkg/seqnum"

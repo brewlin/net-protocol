@@ -5,9 +5,9 @@ import (
 	"log"
 	"net"
 	"os"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 
 	"github.com/brewlin/net-protocol/stack"
-	"github.com/brewlin/net-protocol"
 	"github.com/brewlin/net-protocol/protocol/link/fdbased"
 	"github.com/brewlin/net-protocol/protocol/link/tuntap"
 	"github.com/brewlin/net-protocol/protocol/network/arp"

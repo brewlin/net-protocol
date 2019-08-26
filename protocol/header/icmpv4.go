@@ -17,7 +17,7 @@ package header
 import (
 	"encoding/binary"
 
-	"github.com/brewlin/net-protocol"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
 // ICMPv4 represents an ICMPv4 header stored in a byte array.

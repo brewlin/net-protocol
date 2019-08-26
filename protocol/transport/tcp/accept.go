@@ -22,13 +22,13 @@ import (
 	"time"
 
 	"crypto/sha1"
-	"github.com/brewlin/net-protocol/rand"
-	"github.com/brewlin/net-protocol/sleep"
+	"github.com/brewlin/net-protocol/pkg/rand"
+	"github.com/brewlin/net-protocol/pkg/sleep"
 	tcpip "github.com/brewlin/net-protocol"
 	"github.com/brewlin/net-protocol/protocol/header"
-	"github.com/brewlin/net-protocol/seqnum"
+	"github.com/brewlin/net-protocol/pkg/seqnum"
 	"github.com/brewlin/net-protocol/stack"
-	"github.com/brewlin/net-protocol/waiter"
+	"github.com/brewlin/net-protocol/pkg/waiter"
 )
 
 const (

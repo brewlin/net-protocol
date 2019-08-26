@@ -22,10 +22,10 @@ import (
 	"github.com/brewlin/net-protocol/checker"
 	"github.com/brewlin/net-protocol/protocol/header"
 	"github.com/brewlin/net-protocol/protocol/network/ipv4"
-	"github.com/brewlin/net-protocol/seqnum"
+	"github.com/brewlin/net-protocol/pkg/seqnum"
 	"github.com/brewlin/net-protocol/protocol/transport/tcp"
 	"github.com/brewlin/net-protocol/protocol/transport/tcp/testing/context"
-	"github.com/brewlin/net-protocol/waiter"
+	"github.com/brewlin/net-protocol/pkg/waiter"
 )
 
 func TestV4MappedConnectOnV6Only(t *testing.T) {

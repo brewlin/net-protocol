@@ -38,8 +38,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/brewlin/net-protocol/buffer"
-	"github.com/brewlin/net-protocol/waiter"
+	"github.com/brewlin/net-protocol/pkg/buffer"
+	"github.com/brewlin/net-protocol/pkg/waiter"
 )
 
 // Error represents an error in the github.com/brewlin/net-protocol error space. Using a special type

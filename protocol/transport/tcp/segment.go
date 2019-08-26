@@ -18,9 +18,9 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"github.com/brewlin/net-protocol/buffer"
+	"github.com/brewlin/net-protocol/pkg/buffer"
 	"github.com/brewlin/net-protocol/protocol/header"
-	"github.com/brewlin/net-protocol/seqnum"
+	"github.com/brewlin/net-protocol/pkg/seqnum"
 	"github.com/brewlin/net-protocol/stack"
 )
 

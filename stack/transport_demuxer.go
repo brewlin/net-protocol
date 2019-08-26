@@ -18,7 +18,7 @@ import (
 	"sync"
 
 	"github.com/brewlin/net-protocol"
-	"github.com/brewlin/net-protocol/buffer"
+	"github.com/brewlin/net-protocol/pkg/buffer"
 	"github.com/brewlin/net-protocol/protocol/header"
 )
 

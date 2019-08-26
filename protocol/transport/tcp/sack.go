@@ -16,7 +16,7 @@ package tcp
 
 import (
 	"github.com/brewlin/net-protocol/protocol/header"
-	"github.com/brewlin/net-protocol/seqnum"
+	"github.com/brewlin/net-protocol/pkg/seqnum"
 )
 
 const (

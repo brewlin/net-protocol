@@ -24,7 +24,7 @@ import (
 	"github.com/brewlin/net-protocol/protocol/network/ipv4"
 	"github.com/brewlin/net-protocol/stack"
 	"github.com/brewlin/net-protocol/protocol/transport/udp"
-	"github.com/brewlin/net-protocol/waiter"
+	"github.com/brewlin/net-protocol/pkg/waiter"
 )
 
 func TestExcludeBroadcast(t *testing.T) {

@@ -20,7 +20,7 @@ import (
 	"testing"
 
 	"github.com/brewlin/net-protocol/protocol/header"
-	"github.com/brewlin/net-protocol/seqnum"
+	"github.com/brewlin/net-protocol/pkg/seqnum"
 	"github.com/brewlin/net-protocol/protocol/transport/tcp"
 	"github.com/brewlin/net-protocol/protocol/transport/tcp/testing/context"
 )

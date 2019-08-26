@@ -20,7 +20,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/brewlin/net-protocol/sleep"
+	"github.com/brewlin/net-protocol/pkg/sleep"
 	"github.com/brewlin/net-protocol"
 )
 

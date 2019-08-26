@@ -20,7 +20,7 @@ import (
 
 	"github.com/brewlin/net-protocol/protocol/header"
 
-	"github.com/brewlin/net-protocol/rand"
+	"github.com/brewlin/net-protocol/pkg/rand"
 )
 
 var hashIV = RandN32(1)[0]

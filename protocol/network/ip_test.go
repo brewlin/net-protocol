@@ -18,7 +18,7 @@ import (
 	"testing"
 
 	"github.com/brewlin/net-protocol"
-	"github.com/brewlin/net-protocol/buffer"
+	"github.com/brewlin/net-protocol/pkg/buffer"
 	"github.com/brewlin/net-protocol/protocol/header"
 	"github.com/brewlin/net-protocol/link/loopback"
 	"github.com/brewlin/net-protocol/protocol/network/ipv4"

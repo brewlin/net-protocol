@@ -18,7 +18,7 @@ import (
 	"container/heap"
 	"fmt"
 
-	"github.com/brewlin/net-protocol/buffer"
+	"github.com/brewlin/net-protocol/pkg/buffer"
 )
 
 type fragment struct {

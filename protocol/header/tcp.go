@@ -18,7 +18,7 @@ import (
 	"encoding/binary"
 
 	"github.com/brewlin/net-protocol"
-	"github.com/brewlin/net-protocol/seqnum"
+	"github.com/brewlin/net-protocol/pkg/seqnum"
 )
 
 const (

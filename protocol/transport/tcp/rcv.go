@@ -17,7 +17,7 @@ package tcp
 import (
 	"container/heap"
 
-	"github.com/brewlin/net-protocol/seqnum"
+	"github.com/brewlin/net-protocol/pkg/seqnum"
 )
 
 // receiver holds the state necessary to receive TCP segments and turn them

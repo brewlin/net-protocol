@@ -29,13 +29,13 @@ import (
 	"sync"
 	"time"
 
-	"github.com/brewlin/net-protocol/sleep"
+	"github.com/brewlin/net-protocol/pkg/sleep"
 	"github.com/brewlin/net-protocol"
-	"github.com/brewlin/net-protocol/buffer"
+	"github.com/brewlin/net-protocol/pkg/buffer"
 	"github.com/brewlin/net-protocol/protocol/header"
 	"github.com/brewlin/net-protocol/protocol/ports"
-	"github.com/brewlin/net-protocol/seqnum"
-	"github.com/brewlin/net-protocol/waiter"
+	"github.com/brewlin/net-protocol/pkg/seqnum"
+	"github.com/brewlin/net-protocol/pkg/waiter"
 )
 
 const (

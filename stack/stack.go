@@ -503,7 +503,7 @@ func (s *Stack) NewEndpoint(transport tcpip.TransportProtocolNumber, network tcp
 // optionally enable it.
 // 新建一个网卡对象，并且激活它，激活的意思就是准备好从网卡中读取和写入数据。
 func (s *Stack) createNIC(id tcpip.NICID, name string, linkEP tcpip.LinkEndpointID, enabled bool) *tcpip.Error {
-	log.Println("@createnic 新建网卡对象,并启动网卡事件")
+	log.Println("@网卡 stack: 新建网卡对象,并启动网卡事件")
 	ep := FindLinkEndpoint(linkEP)
 	if ep == nil {
 		return tcpip.ErrBadLinkEndpoint
@@ -774,7 +774,7 @@ func (s *Stack) CheckNetworkProtocol(protocol tcpip.NetworkProtocolNumber) bool 
 //nicid 网卡id   protocol 协议号[arp|ipv4|...] 通过以太网协议第12-14字节获得  addr 地址
 func (s *Stack) CheckLocalAddress(nicid tcpip.NICID, protocol tcpip.NetworkProtocolNumber, addr tcpip.Address) tcpip.NICID {
 	s.mu.RLock()
-	log.Println("@stack 协议解析 nicid:", nicid, " protocol:", protocol, " addr:", addr)
+	log.Println("@网卡 stack: 协议解析 nicid:", nicid, " protocol:", protocol, " addr:", addr)
 	defer s.mu.RUnlock()
 
 	// If a NIC is specified, we try to find the address there only.

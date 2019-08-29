@@ -73,7 +73,7 @@ func (e *endpoint) handleICMP(r *stack.Route, vv buffer.VectorisedView) {
 		if len(v) < header.ICMPv4EchoMinimumSize {
 			return
 		}
-		log.Printf("@icmp 接受报文:echo")
+		log.Printf("@网络层 icmp: 接受报文:echo")
 		vv.TrimFront(header.ICMPv4MinimumSize)
 		req := echoRequest{r: r.Clone(), v: vv.ToView()}
 		select {
@@ -129,7 +129,7 @@ func sendPing4(r *stack.Route, code byte, data buffer.View) *tcpip.Error {
 	data = data[header.ICMPv4EchoMinimumSize-header.ICMPv4MinimumSize:]
 	icmpv4.SetChecksum(^header.Checksum(icmpv4, header.Checksum(data, 0)))
 
-	log.Printf("@icmp 响应报文：传递给ip层处理")
+	log.Printf("@网络层 icmp: 响应报文：传递给ip层处理")
 	// 传给ip层处理
 	return r.WritePacket(hdr, data.ToVectorisedView(), header.ICMPv4ProtocolNumber, r.DefaultTTL())
 }

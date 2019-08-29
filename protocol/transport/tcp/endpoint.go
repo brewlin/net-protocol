@@ -22,15 +22,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/brewlin/net-protocol/pkg/rand"
-	"github.com/brewlin/net-protocol/pkg/sleep"
-	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/pkg/buffer"
-	"github.com/brewlin/net-protocol/protocol/header"
+	"github.com/brewlin/net-protocol/pkg/rand"
 	"github.com/brewlin/net-protocol/pkg/seqnum"
-	"github.com/brewlin/net-protocol/stack"
+	"github.com/brewlin/net-protocol/pkg/sleep"
 	"github.com/brewlin/net-protocol/pkg/tmutex"
 	"github.com/brewlin/net-protocol/pkg/waiter"
+	tcpip "github.com/brewlin/net-protocol/protocol"
+	"github.com/brewlin/net-protocol/protocol/header"
+	"github.com/brewlin/net-protocol/stack"
 )
 
 type endpointState int
@@ -940,6 +940,7 @@ func (e *endpoint) Connect(addr tcpip.FullAddress) *tcpip.Error {
 // 在恢复先前连接的端点时，将被动地创建两端（因此不会进行新的握手）;对于应用程序尚未接受的堆栈接受连接，
 // 它们将在不运行主goroutine的情况下进行恢复。
 func (e *endpoint) connect(addr tcpip.FullAddress, handshake bool, run bool) (err *tcpip.Error) {
+	log.Println("@传输层: tcp  connect")
 	e.mu.Lock()
 	defer e.mu.Unlock()
 	defer func() {
@@ -1392,7 +1393,7 @@ func (e *endpoint) HandlePacket(r *stack.Route, id stack.TransportEndpointID, vv
 
 	// Send packet to worker goroutine.
 	if e.segmentQueue.enqueue(s) {
-		log.Printf("recv tcp %s segment from %s, seq: %d, ack: %d",
+		log.Printf("@传输层 tcp:recv tcp %s segment from %s, seq: %d, ack: %d",
 			flagString(s.flags), fmt.Sprintf("%s:%d", s.id.RemoteAddress, s.id.RemotePort),
 			s.sequenceNumber, s.ackNumber)
 		e.newSegmentWaker.Assert()

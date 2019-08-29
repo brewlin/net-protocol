@@ -128,7 +128,7 @@ func (f *Fragmentation) release(r *reassembler) {
 	f.rList.Remove(r)
 	f.size -= r.size
 	if f.size < 0 {
-		log.Printf("memory counter < 0 (%d), this is an accounting bug that requires investigation", f.size)
+		log.Printf("@网络层 fragmentaion: memory counter < 0 (%d), this is an accounting bug that requires investigation", f.size)
 		f.size = 0
 	}
 }

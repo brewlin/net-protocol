@@ -113,6 +113,7 @@ func (e *endpoint) LinkAddress() tcpip.LinkAddress {
 
 //将上层的报文经过链路层封装，写入网卡中，如果写入失败则丢弃该报文
 func (e *endpoint) WritePacket(r *stack.Route, hdr buffer.Prependable, payload buffer.VectorisedView, protocol tcpip.NetworkProtocolNumber) *tcpip.Error {
+	log.Println("@链路层: fdbased 写入网卡数据 ", hdr.View)
 	//如果目标地址就是设备本身自己，则将报文重新返回给协议栈
 	if e.handleLocal && r.LocalAddress != "" && r.LocalAddress == r.RemoteAddress {
 		views := make([]buffer.View, 1, 1+len(payload.Views()))
@@ -137,7 +138,6 @@ func (e *endpoint) WritePacket(r *stack.Route, hdr buffer.Prependable, payload b
 	}
 	eth.Encode(ethHdr)
 
-	log.Println("@link fdbased: 链路层 写入网卡数据 ", hdr.View)
 	//写入网卡中
 	if payload.Size() == 0 {
 		return rawfile.NonBlockingWrite(e.fd, hdr.View())
@@ -187,7 +187,7 @@ func (e *endpoint) IsAttached() bool {
 
 //循环从fd读取数据，然后将数据包分发给协议栈
 func (e *endpoint) dispatchLoop() *tcpip.Error {
-	log.Println("@dispatch 调度进行事件循环接受物理网卡数据 dispatchLoop")
+	log.Println("@链路层 fdbased: dispatch 调度进行事件循环接受物理网卡数据 dispatchLoop")
 	for {
 		cont, err := e.dispatch()
 		if err != nil || !cont {
@@ -205,13 +205,13 @@ func (e *endpoint) dispatch() (bool, *tcpip.Error) {
 	e.allocateViews(BufConfig)
 	//从网卡中读取数据
 	n, err := rawfile.BlockingReadv(e.fd, e.iovecs)
-	log.Printf("@step1 物理网卡接受数据read %d bytes", n)
+	log.Printf("@链路层 fdbased: step1 物理网卡接受数据read %d bytes", n)
 	if err != nil {
 		return false, err
 	}
 	//如果比头部长度还小，直接丢弃
 	if n <= e.hdrSize {
-		log.Printf("read %d bytes < header bytest %d,比头部长度还小直接丢弃", n, e.hdrSize)
+		log.Printf("@链路层 fdbased: read %d bytes < header bytest %d,比头部长度还小直接丢弃", n, e.hdrSize)
 		return false, nil
 	}
 	var (
@@ -223,7 +223,7 @@ func (e *endpoint) dispatch() (bool, *tcpip.Error) {
 	p = eth.Type()
 	remoteLinkAddr = eth.SourceAddress()
 	localLinkAddr = eth.DestinationAddress()
-	log.Println("@step2 解析以太网协议:", eth, p, remoteLinkAddr, localLinkAddr)
+	log.Println("@链路层 fdbased: step2 解析以太网协议:", eth, p, remoteLinkAddr, localLinkAddr)
 
 	used := e.capViews(n, BufConfig)
 	vv := buffer.NewVectorisedView(n, e.views[:used])

@@ -558,7 +558,7 @@ func (e *endpoint) GetSockOpt(opt interface{}) *tcpip.Error {
 // provided identity.
 // 增加UDP头部信息，并发送给给网络层
 func sendUDP(r *stack.Route, data buffer.VectorisedView, localPort, remotePort uint16, ttl uint8) *tcpip.Error {
-	log.Println("@transport udp: 传输层 udp协议 封装头部信息，发送给网络层  sendudp")
+	log.Println("@传输层 udp: 传输层 udp协议 封装头部信息，发送给网络层  sendudp")
 	// Allocate a buffer for the UDP header.
 	hdr := buffer.NewPrependable(header.UDPMinimumSize + int(r.MaxHeaderLength()))
 
@@ -625,7 +625,7 @@ func (e *endpoint) checkV4Mapped(addr *tcpip.FullAddress, allowMismatch bool) (t
 // Connect connects the endpoint to its peer. Specifying a NIC is optional.
 // 连接UDP对端，当发送数据的时候用这个地址来填充目标地址
 func (e *endpoint) Connect(addr tcpip.FullAddress) *tcpip.Error {
-	log.Println("@transport udp: connect 发送数据进行连接")
+	log.Println("@传输层 udp: connect 发送数据进行连接")
 	// 目标端口为0是错误的
 	if addr.Port == 0 {
 		// We don't support connecting to port zero.
@@ -921,7 +921,7 @@ func (e *endpoint) Readiness(mask waiter.EventMask) waiter.EventMask {
 // endpoint.
 // 从网络层接收到UDP数据报时的处理函数
 func (e *endpoint) HandlePacket(r *stack.Route, id stack.TransportEndpointID, vv buffer.VectorisedView) {
-	log.Println("@transport udp: handlepacket 从网络层接收到udp数据包 进行处理 ")
+	log.Println("@传输层 udp: handlepacket 从网络层接收到udp数据包 进行处理 ")
 	// Get the header then trim it from the view.
 	hdr := header.UDP(vv.First())
 	if int(hdr.Length()) > vv.Size() {

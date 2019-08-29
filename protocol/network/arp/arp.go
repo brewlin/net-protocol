@@ -89,7 +89,7 @@ func (e *endpoint) WritePacket(r *stack.Route, hdr buffer.Prependable, payload b
 
 // arp数据包的处理，包括arp请求和响应
 func (e *endpoint) HandlePacket(r *stack.Route, vv buffer.VectorisedView) {
-	log.Println("@arp step1 : 解析arp数据包，包括arp请求和响应")
+	log.Println("@网络层 arp: step1 : 解析arp数据包，包括arp请求和响应")
 	v := vv.First()
 	h := header.ARP(v)
 	if !h.IsValid() {
@@ -100,7 +100,7 @@ func (e *endpoint) HandlePacket(r *stack.Route, vv buffer.VectorisedView) {
 	switch h.Op() {
 	case header.ARPRequest:
 		// 如果是arp请求
-		log.Println("@arp step2 : 解析arp请求")
+		log.Println("@网络层 arp: step2 : 解析arp请求")
 		localAddr := tcpip.Address(h.ProtocolAddressTarget())
 		if e.linkAddrCache.CheckLocalAddress(e.nicid, header.IPv4ProtocolNumber, localAddr) == 0 {
 			return // we have no useful answer, ignore the request
@@ -112,7 +112,7 @@ func (e *endpoint) HandlePacket(r *stack.Route, vv buffer.VectorisedView) {
 		copy(pkt.HardwareAddressSender(), r.LocalLinkAddress[:])
 		copy(pkt.ProtocolAddressSender(), h.ProtocolAddressTarget())
 		copy(pkt.ProtocolAddressTarget(), h.ProtocolAddressSender())
-		log.Println("@arp reply: 发送arp回复")
+		log.Println("@网络层 arp: reply: 发送arp回复")
 		e.linkEP.WritePacket(r, hdr, buffer.VectorisedView{}, ProtocolNumber)
 		// 注意这里的 fallthrough 表示需要继续执行下面分支的代码
 		// 当收到 arp 请求需要添加到链路地址缓存中

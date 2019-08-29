@@ -149,7 +149,7 @@ func (e *linkAddrEntry) removeWaker(w *sleep.Waker) {
 
 // add adds a k -> v mapping to the cache.
 func (c *linkAddrCache) add(k tcpip.FullAddress, v tcpip.LinkAddress) {
-	log.Printf("@linkaddrcache : 路由表缓存 %v-%v", k, v)
+	log.Printf("@路由表 route: linkaddrcache 路由表缓存 %v-%v", k, v)
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
@@ -202,7 +202,7 @@ func (c *linkAddrCache) makeAndAddEntry(k tcpip.FullAddress, v tcpip.LinkAddress
 
 // get reports any known link address for k.
 func (c *linkAddrCache) get(k tcpip.FullAddress, linkRes LinkAddressResolver, localAddr tcpip.Address, linkEP LinkEndpoint, waker *sleep.Waker) (tcpip.LinkAddress, <-chan struct{}, *tcpip.Error) {
-	log.Printf("link addr get linkRes: %#v, addr: %+v", linkRes, k)
+	log.Printf("@路由表 route: link addr get linkRes: %#v, addr: %+v", linkRes, k)
 	if linkRes != nil {
 		if addr, ok := linkRes.ResolveStaticAddress(k.Addr); ok {
 			return addr, nil, nil

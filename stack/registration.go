@@ -361,7 +361,7 @@ func RegisterLinkEndpoint(linkEP LinkEndpoint) tcpip.LinkEndpointID {
 	nextLinkEndpointID++
 
 	linkEndpoints[v] = linkEP
-	log.Println("@register 注册链路层设备LinkEndpointID:", v)
+	log.Println("@协议栈 stack: register 注册链路层设备LinkEndpointID:", v)
 
 	return v
 }

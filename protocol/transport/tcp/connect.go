@@ -20,14 +20,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/brewlin/net-protocol/pkg/rand"
-	"github.com/brewlin/net-protocol/pkg/sleep"
-	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/pkg/buffer"
-	"github.com/brewlin/net-protocol/protocol/header"
+	"github.com/brewlin/net-protocol/pkg/rand"
 	"github.com/brewlin/net-protocol/pkg/seqnum"
-	"github.com/brewlin/net-protocol/stack"
+	"github.com/brewlin/net-protocol/pkg/sleep"
 	"github.com/brewlin/net-protocol/pkg/waiter"
+	tcpip "github.com/brewlin/net-protocol/protocol"
+	"github.com/brewlin/net-protocol/protocol/header"
+	"github.com/brewlin/net-protocol/stack"
 )
 
 // maxSegmentsPerWake is the maximum number of segments to process in the main
@@ -672,7 +672,7 @@ func sendTCP(r *stack.Route, id stack.TransportEndpointID, data buffer.Vectorise
 		r.Stats().TCP.ResetsSent.Increment()
 	}
 
-	log.Printf("send tcp %s segment to %s, seq: %d, ack: %d, rcvWnd: %d",
+	log.Printf("@传输层 tcp: send tcp %s segment to %s, seq: %d, ack: %d, rcvWnd: %d",
 		flagString(flags), fmt.Sprintf("%s:%d", id.RemoteAddress, id.RemotePort),
 		seq, ack, rcvWnd)
 
@@ -808,6 +808,7 @@ func (e *endpoint) handleSegments() *tcpip.Error {
 		}
 
 		// Invoke the tcp probe if installed.
+		// 如果已安装 则调用探针
 		if e.probe != nil {
 			e.probe(e.completeState())
 		}

@@ -10,7 +10,7 @@ func main() {
 	var (
 		addr = flag.String("a", "192.168.1.1:9000", "udp dst address")
 	)
-	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	log.SetFlags(log.Lshortfile)
 
 	udpAddr, err := net.ResolveUDPAddr("udp", *addr)
 	if err != nil {

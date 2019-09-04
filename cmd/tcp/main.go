@@ -25,7 +25,7 @@ var mac = flag.String("mac", "aa:00:01:01:01:01", "mac address to use in tap dev
 
 func main() {
 	flag.Parse()
-	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	log.SetFlags(log.Lshortfile)
 
 	if len(os.Args) != 3 {
 		log.Fatal("usage:", os.Args[0], "<ipv4-address><port>")

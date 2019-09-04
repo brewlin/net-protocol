@@ -29,7 +29,7 @@ func main() {
 		log.Fatal("usage: ", os.Args[0], " < tap-device> <local-address/mask> <ip-address>")
 	}
 
-	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	log.SetFlags(log.Lshortfile)
 	tapName := flag.Arg(0)
 	cidrName := flag.Arg(1)
 	addrName := flag.Arg(2)

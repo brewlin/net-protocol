@@ -1,14 +1,23 @@
 package main
 
 import (
+	"flag"
 	"log"
+	"os"
 
 	"github.com/brewlin/net-protocol/protocol/link/rawfile"
 	"github.com/brewlin/net-protocol/protocol/link/tuntap"
 )
 
 func main() {
-	tapName := "tap0"
+	flag.Parse()
+	log.SetFlags(log.Lshortfile)
+	if len(flag.Args()) < 2 {
+		log.Fatal("Usage: ", os.Args[0], " <tap-device> <local-address/mask")
+	}
+	tapName := flag.Arg(0)
+	route := flag.Arg(1)
+
 	c := &tuntap.Config{tapName, tuntap.TAP}
 	fd, err := tuntap.NewNetDev(c)
 	if err != nil {
@@ -20,14 +29,15 @@ func main() {
 	//添加IP地址
 	// tuntap.AddIP(tapName, "192.168.1.1")
 	//设置路由
-	tuntap.SetRoute(tapName, "192.168.1.0/24")
+	log.Println(tapName, route)
+	tuntap.SetRoute(tapName, route)
 	buf := make([]byte, 1<<16)
 	for {
-		rn, err := rawfile.BlockingRead(fd, buf)
+		_, err := rawfile.BlockingRead(fd, buf)
 		if err != nil {
 			log.Println(err)
 			continue
 		}
-		log.Println("read %d bytes", rn)
+		log.Println("@网卡 :recv ", buf)
 	}
 }

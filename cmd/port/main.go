@@ -8,15 +8,15 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/brewlin/net-protocol/pkg/waiter"
 	"github.com/brewlin/net-protocol/protocol/link/fdbased"
 	"github.com/brewlin/net-protocol/protocol/link/tuntap"
 	"github.com/brewlin/net-protocol/protocol/network/arp"
 	"github.com/brewlin/net-protocol/protocol/network/ipv4"
 	"github.com/brewlin/net-protocol/protocol/network/ipv6"
-	"github.com/brewlin/net-protocol/stack"
 	"github.com/brewlin/net-protocol/protocol/transport/tcp"
 	"github.com/brewlin/net-protocol/protocol/transport/udp"
-	"github.com/brewlin/net-protocol/pkg/waiter"
+	"github.com/brewlin/net-protocol/stack"
 
 	tcpip "github.com/brewlin/net-protocol/protocol"
 )
@@ -24,6 +24,7 @@ import (
 var mac = flag.String("mac", "01:01:01:01:01:01", "mac address to use in tap device")
 
 func main() {
+	log.SetFlags(log.Lshortfile)
 	flag.Parse()
 	if len(flag.Args()) != 3 {
 		log.Fatal("usage: ", os.Args[0], " < tap-device> <listen-address> port")

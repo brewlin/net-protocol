@@ -7,13 +7,13 @@ import (
 	"os"
 	"strings"
 
-	"github.com/brewlin/net-protocol/stack"
 	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/protocol/link/fdbased"
 	"github.com/brewlin/net-protocol/protocol/link/tuntap"
 	"github.com/brewlin/net-protocol/protocol/network/arp"
 	"github.com/brewlin/net-protocol/protocol/network/ipv4"
 	"github.com/brewlin/net-protocol/protocol/network/ipv6"
+	"github.com/brewlin/net-protocol/stack"
 )
 
 func main() {
@@ -22,7 +22,7 @@ func main() {
 	if len(flag.Args()) < 2 {
 		log.Fatal("Usage: ", os.Args[0], " <tap-device> <local-address/mask")
 	}
-	log.SetFlags(log.Lshortfile | log.LstdFlags)
+	log.SetFlags(log.Lshortfile)
 
 	tapName := flag.Arg(0)
 	cidrName := flag.Arg(1)

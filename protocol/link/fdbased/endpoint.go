@@ -137,7 +137,6 @@ func (e *endpoint) WritePacket(r *stack.Route, hdr buffer.Prependable, payload b
 		ethHdr.SrcAddr = e.addr
 	}
 	eth.Encode(ethHdr)
-
 	//写入网卡中
 	if payload.Size() == 0 {
 		return rawfile.NonBlockingWrite(e.fd, hdr.View())

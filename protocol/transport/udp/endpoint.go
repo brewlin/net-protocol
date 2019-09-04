@@ -358,7 +358,7 @@ func (e *endpoint) Write(p tcpip.Payload, opts tcpip.WriteOptions) (uintptr, <-c
 			return 0, nil, err
 		}
 
-		log.Printf("netProto: 0x%x", netProto)
+		log.Printf("@传输层 udp: 写入udp数据 netProto: 0x%x", netProto)
 		// Find the enpoint.
 		// 根据目的地址和协议找到相关路由信息
 		r, err := e.stack.FindRoute(nicid, e.id.LocalAddress, to.Addr, netProto)
@@ -588,7 +588,6 @@ func sendUDP(r *stack.Route, data buffer.VectorisedView, localPort, remotePort u
 	r.Stats().UDP.PacketsSent.Increment()
 
 	// 将准备好的UDP首部和数据写给网络层
-	log.Printf("send udp %d bytes", hdr.UsedLength()+data.Size())
 	return r.WritePacket(hdr, data, ProtocolNumber, ttl)
 }
 
@@ -975,7 +974,7 @@ func (e *endpoint) HandlePacket(r *stack.Route, id stack.TransportEndpointID, vv
 	if wasEmpty {
 		e.waiterQueue.Notify(waiter.EventIn)
 	}
-	log.Printf("recv udp %d bytes", hdr.Length())
+	log.Printf("@传输层 udp: recv udp %d bytes", hdr.Length())
 }
 
 // HandleControlPacket implements stack.TransportEndpoint.HandleControlPacket.

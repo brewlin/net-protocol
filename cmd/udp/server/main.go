@@ -21,12 +21,13 @@ import (
 	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
-var mac = flag.String("mac", "01:01:01:01:01:01", "mac address to use in tap device")
+// var mac = flag.String("mac", "01:01:01:01:01:01", "mac address to use in tap device")
+var mac = flag.String("mac", "aa:00:01:01:01:01", "mac address to use in tap device")
 
 func main() {
 	flag.Parse()
 	if len(flag.Args()) != 4 {
-		log.Fatal("usage: ", os.Args[0], " < tap-device> <local-address/mask> <ip-address>")
+		log.Fatal("usage: ", os.Args[0], " < tap-device> <local-address/mask> <ip-address> <port>")
 	}
 
 	log.SetFlags(log.Lshortfile)
@@ -84,9 +85,10 @@ func main() {
 
 	//抽象网卡的文件接口 实现的接口
 	linkID := fdbased.New(&fdbased.Options{
-		FD:      fd,
-		MTU:     1500,
-		Address: tcpip.LinkAddress(maddr),
+		FD:                 fd,
+		MTU:                1500,
+		Address:            tcpip.LinkAddress(maddr),
+		ResolutionRequired: true,
 	})
 	//新建相关协议的协议栈
 	s := stack.New([]string{ipv4.ProtocolName, arp.ProtocolName}, []string{tcp.ProtocolName, udp.ProtocolName}, stack.Options{})
@@ -124,7 +126,7 @@ func main() {
 	}
 	//绑定本地端口
 	if err := ep.Bind(tcpip.FullAddress{1, addr, uint16(localPort)}, nil); err != nil {
-		log.Fatal("bind failed :", err)
+		log.Fatal("@main : bind failed :", err)
 	}
 	echo(&wq, ep)
 
@@ -147,7 +149,7 @@ func echo(wq *waiter.Queue, ep tcpip.Endpoint) {
 			}
 			return
 		}
-		log.Printf("read and write data:%s", string(v))
+		log.Printf("@main :read and write data:%s", string(v))
 		_, _, err = ep.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: &saddr})
 		if err != nil {
 			log.Fatal(err)
@@ -164,11 +166,11 @@ func tcpListen(s *stack.Stack, proto tcpip.NetworkProtocolNumber, localPort int)
 	//绑定ip和端口，这里的ip地址为空，表示绑定任何ip
 	//此时就会调用端口管理器
 	if err := ep.Bind(tcpip.FullAddress{0, "", uint16(localPort)}, nil); err != nil {
-		log.Fatal("Bind failed: ", err)
+		log.Fatal("@main : Bind failed: ", err)
 	}
 	//开始监听
 	if err := ep.Listen(10); err != nil {
-		log.Fatal("Listen failed : ", err)
+		log.Fatal("@main : Listen failed : ", err)
 	}
 	return ep
 }
@@ -183,7 +185,7 @@ func udpListen(s *stack.Stack, proto tcpip.NetworkProtocolNumber, localPort int)
 	//绑定ip和端口，这里的ip地址为空，表示绑定任何ip
 	//此时就会调用端口管理器
 	if err := ep.Bind(tcpip.FullAddress{0, "", uint16(localPort)}, nil); err != nil {
-		log.Fatal("Bind failed: ", err)
+		log.Fatal("@main :Bind failed: ", err)
 	}
 	//注意udp是无连接的，它不需要listen
 	return ep

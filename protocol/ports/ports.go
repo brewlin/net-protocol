@@ -128,7 +128,7 @@ func (s *PortManager) ReservePort(networks []tcpip.NetworkProtocolNumber, transp
 			return 0, tcpip.ErrPortInUse
 		}
 		reservedPort = port
-		log.Printf("new transport: %d, port: %d", transport, reservedPort)
+		log.Printf("@端口 port: 协议绑定端口 new transport: %d, port: %d", transport, reservedPort)
 		return
 	}
 
@@ -136,7 +136,7 @@ func (s *PortManager) ReservePort(networks []tcpip.NetworkProtocolNumber, transp
 	reservedPort, err = s.PickEphemeralPort(func(p uint16) (bool, *tcpip.Error) {
 		return s.reserveSpecificPort(networks, transport, addr, p), nil
 	})
-	log.Printf("new transport: %d, port: %d", transport, reservedPort)
+	log.Printf("@端口 port: 随机分配端口 协议绑定端口 new transport: %d, port: %d", transport, reservedPort)
 	return
 }
 
@@ -175,7 +175,7 @@ func (s *PortManager) ReleasePort(networks []tcpip.NetworkProtocolNumber, transp
 	for _, network := range networks {
 		desc := portDescriptor{network, transport, port}
 		if m, ok := s.allocatedPorts[desc]; ok {
-			log.Printf("delete transport: %d, port: %d", transport, port)
+			log.Printf("@端口 port: 释放端口 delete transport: %d, port: %d", transport, port)
 			delete(m, addr)
 			if len(m) == 0 {
 				delete(s.allocatedPorts, desc)

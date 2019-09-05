@@ -36,7 +36,7 @@ func main() {
 	addr := tcpip.Address(net.ParseIP(addrName).To4())
 	port, err := strconv.Atoi(portName)
 	if err != nil {
-		log.Fatal("Unable to convert port %v:%v", portName, err)
+		log.Fatal("@main cmd/tcp:Unable to convert port %v:%v", portName, err)
 	}
 	s := newStack(addr, port)
 	done := make(chan int, 1)
@@ -82,11 +82,11 @@ func tcpServer(s *stack.Stack, addr tcpip.Address, port int, done chan int) {
 	}
 	//绑定本地端口
 	if err := ep.Bind(tcpip.FullAddress{0, "", uint16(port)}, nil); err != nil {
-		log.Fatal("Bind failed: ", err)
+		log.Fatal("@main cmd/tcp: Bind failed: ", err)
 	}
 	//监听tcp
 	if err := ep.Listen(10); err != nil {
-		log.Fatal("Listen failed: ", err)
+		log.Fatal("@main cmd/tcp: Listen failed: ", err)
 	}
 	//等待连接 出现
 	waitEntry, notifyCh := waiter.NewChannelEntry(nil)
@@ -102,10 +102,10 @@ func tcpServer(s *stack.Stack, addr tcpip.Address, port int, done chan int) {
 				<-notifyCh
 				continue
 			}
-			log.Fatal("Accept() failed: ", err)
+			log.Fatal("@main cmd/tcp: Accept() failed: ", err)
 		}
 		ra, err := n.GetRemoteAddress()
-		log.Printf("new conn: %v %v", ra, err)
+		log.Printf("@main cmd/tcp : new conn: %v %v", ra, err)
 	}
 }
 
@@ -125,19 +125,19 @@ func tcpClient(s *stack.Stack, addr tcpip.Address, port int) {
 	wq.EventRegister(&waitEntry, waiter.EventOut)
 	terr := ep.Connect(remote)
 	if terr == tcpip.ErrConnectStarted {
-		log.Println("Connect is pending...")
+		log.Println("@main cmd/tcp: Connect is pending...")
 		<-notifyCh
 		terr = ep.GetSockOpt(tcpip.ErrorOption{})
 	}
 	wq.EventUnregister(&waitEntry)
 	if terr != nil {
-		log.Fatal("Unable to connect: ", terr)
+		log.Fatal("@main cmd/tcp: Unable to connect: ", terr)
 	}
-	log.Println("Connected")
+	log.Println("@main cmd/tcp: Connected")
 	time.Sleep(1 * time.Second)
 
 	ep.Close()
-	log.Println("tcp disconnected")
+	log.Println("@main cmd/tcp:tcp disconnected")
 	time.Sleep(3 * time.Second)
 
 }

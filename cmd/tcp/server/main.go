@@ -1,18 +1,19 @@
 package main
 
 import (
-	"github.com/brewlin/net-protocol/protocol/link/fdbased"
-	"github.com/brewlin/net-protocol/protocol/link/tuntap"
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"os"
 	"strconv"
 	"strings"
 
-	"github.com/brewlin/net-protocol/protocol/network/ipv6"
+	"github.com/brewlin/net-protocol/protocol/link/fdbased"
+	"github.com/brewlin/net-protocol/protocol/link/tuntap"
+	"github.com/brewlin/net-protocol/protocol/transport/udp"
 
-	"github.com/brewlin/net-protocol/protocol/link/loopback"
+	"github.com/brewlin/net-protocol/protocol/network/ipv6"
 
 	"github.com/brewlin/net-protocol/pkg/waiter"
 
@@ -30,7 +31,7 @@ func main() {
 	flag.Parse()
 	log.SetFlags(log.Lshortfile)
 
-	if len(os.Args) != 4 {
+	if len(flag.Args()) != 4 {
 		log.Fatal("usage:", os.Args[0], "<tap-device> <local-address/mask> <ipv4-address> <port>")
 	}
 	tapName := flag.Arg(0)
@@ -57,30 +58,30 @@ func main() {
 	} else if parseAddr.To16() != nil {
 		addr = tcpip.Address(net.ParseIP(addrName).To16())
 		proto = ipv6.ProtocolNumber
-	}else{
+	} else {
 		log.Fatal("unkonw iptype")
 	}
-	localPort ,err := strconv.Atoi(portName)
+	localPort, err := strconv.Atoi(portName)
 	if err != nil {
 		log.Fatalf("unable to convert port")
 	}
 
 	//虚拟网卡配置
 	conf := &tuntap.Config{
-		Name:tapName,
-		Mode:tuntap.TAP,
-	}	
+		Name: tapName,
+		Mode: tuntap.TAP,
+	}
 
 	var fd int
 	//新建虚拟网卡
-	fd ,err = tuntap.NewNetDev(conf)
+	fd, err = tuntap.NewNetDev(conf)
 	if err != nil {
-		log.Fatalf(err)
+		log.Fatal(err)
 	}
 	//启动网卡
 	tuntap.SetLinkUp(tapName)
 	//设置路由
-	tuntap.SetRoute(tapName,cidrName)
+	tuntap.SetRoute(tapName, cidrName)
 
 	//抽象网卡层接口
 	linkID := fdbased.New(&fdbased.Options{
@@ -115,7 +116,7 @@ func main() {
 		},
 	})
 
-	tcpServer(s, addr, port)
+	tcpServer(s, addr, localPort)
 
 }
 
@@ -128,11 +129,11 @@ func tcpServer(s *stack.Stack, addr tcpip.Address, port int) {
 	}
 	//绑定本地端口
 	if err := ep.Bind(tcpip.FullAddress{0, "", uint16(port)}, nil); err != nil {
-		log.Fatal("Bind failed: ", err)
+		log.Fatal("@main :Bind failed: ", err)
 	}
 	//监听tcp
 	if err := ep.Listen(10); err != nil {
-		log.Fatal("Listen failed: ", err)
+		log.Fatal("@main :Listen failed: ", err)
 	}
 	//等待连接 出现
 	waitEntry, notifyCh := waiter.NewChannelEntry(nil)
@@ -141,14 +142,30 @@ func tcpServer(s *stack.Stack, addr tcpip.Address, port int) {
 
 	for {
 		n, _, err := ep.Accept()
+		fmt.Println(err)
 		if err != nil {
 			if err == tcpip.ErrWouldBlock {
 				<-notifyCh
 				continue
 			}
-			log.Fatal("Accept() failed: ", err)
+			log.Fatal("@main: Accept() failed: ", err)
 		}
-		ra, err := n.GetRemoteAddress()
-		log.Printf("new conn: %v %v", ra, err)
+		addr, err := n.GetRemoteAddress()
+		// fmt.Println(addr, err)
+		go dispatch(n, addr)
+		// log.Printf("@main :new conn: %v", addr)
+		// v, c, _ := n.Read(&addr)
+		// log.Println("@main : recv ", v, c)
+		// n.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: &addr})
 	}
+}
+func dispatch(e tcpip.Endpoint, addr tcpip.FullAddress) {
+	// for {
+	log.Printf("@main :new conn: %v", addr)
+	v, c, _ := e.Read(&addr)
+	log.Println("@main : recv ", v, c)
+	e.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: &addr})
+	// e.Close()
+
+	// }
 }

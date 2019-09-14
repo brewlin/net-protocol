@@ -62,9 +62,9 @@ main.go:37: recv :hello
 启动网卡，注册相关协议 以太网协议、arp协议、icmp协议、tcp协议、初始化端口池
 ```
 //tcp 测试基于本地环回网卡，
-cd cmd/tcp;
+cd cmd/tcp/server;
 go build
-./tcp tap1 192.168.1.1 9000
+./tcp tap1 192.168.1.0/24 192.168.1.1 9000
 registration.go:364: @协议栈 stack: register 注册链路层设备LinkEndpointID: 1
 stack.go:506: @网卡 stack: 新建网卡对象,并启动网卡事件
 nic.go:225: @网卡 nic: 在nic网卡上添加网络层，注册和初始化网络协议  protocol: 2048  addr: 192.168.1.1  peb: 0
@@ -111,6 +111,9 @@ ipv4.go:159: @网络层 ipv4: handlePacket 数据包处理
 ipv4.go:195: @网络层 ipv4: handlePacket 分发协议处理，recv ipv4 packet 52 bytes, proto: 0x6
 endpoint.go:1396: @传输层 tcp:recv tcp ack segment from 192.168.1.1:9000, seq: 144691072, ack: 1134465961
 
+cd /cmd/tcp/client
+go build
+./client
 ```
 ## 网卡实验`cmd/link/tap`
 >提供纯净的虚拟网卡实现，未注册任何协议，可以测试原始网卡的收发数据

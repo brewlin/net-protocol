@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/brewlin/net-protocol/pkg/logging"
+
 	"github.com/brewlin/net-protocol/protocol/link/fdbased"
 	"github.com/brewlin/net-protocol/protocol/link/tuntap"
 	"github.com/brewlin/net-protocol/protocol/transport/udp"
@@ -27,9 +29,13 @@ import (
 
 var mac = flag.String("mac", "aa:00:01:01:01:01", "mac address to use in tap device")
 
+func init() {
+	logging.Setup()
+}
+
 func main() {
 	flag.Parse()
-	log.SetFlags(log.Lshortfile)
+	// log.SetFlags(log.Lshortfile)
 
 	if len(flag.Args()) != 4 {
 		log.Fatal("usage:", os.Args[0], "<tap-device> <local-address/mask> <ipv4-address> <port>")
@@ -141,8 +147,8 @@ func tcpServer(s *stack.Stack, addr tcpip.Address, port int) {
 	defer wq.EventUnregister(&waitEntry)
 
 	for {
-		n, _, err := ep.Accept()
-		fmt.Println(err)
+		n, q, err := ep.Accept()
+		fmt.Println(n, q, err)
 		if err != nil {
 			if err == tcpip.ErrWouldBlock {
 				<-notifyCh
@@ -150,22 +156,26 @@ func tcpServer(s *stack.Stack, addr tcpip.Address, port int) {
 			}
 			log.Fatal("@main: Accept() failed: ", err)
 		}
-		addr, err := n.GetRemoteAddress()
-		// fmt.Println(addr, err)
-		go dispatch(n, addr)
-		// log.Printf("@main :new conn: %v", addr)
-		// v, c, _ := n.Read(&addr)
-		// log.Println("@main : recv ", v, c)
-		// n.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: &addr})
+		go dispatch(n, q)
 	}
 }
-func dispatch(e tcpip.Endpoint, addr tcpip.FullAddress) {
-	// for {
+func dispatch(e tcpip.Endpoint, wq *waiter.Queue) {
+	addr, _ := e.GetRemoteAddress()
 	log.Printf("@main :new conn: %v", addr)
-	v, c, _ := e.Read(&addr)
-	log.Println("@main : recv ", v, c)
-	e.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: &addr})
-	// e.Close()
 
-	// }
+	waitEntry, notifyCh := waiter.NewChannelEntry(nil)
+	wq.EventRegister(&waitEntry, waiter.EventIn)
+	defer wq.EventUnregister(&waitEntry)
+	for {
+		v, c, err := e.Read(&addr)
+		if err != nil {
+			fmt.Println(" tcp read  got error")
+			fmt.Println(err)
+			break
+		}
+		log.Println("@main : recv ", v, c)
+		e.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: &addr})
+		<-notifyCh
+	}
+	e.Close()
 }

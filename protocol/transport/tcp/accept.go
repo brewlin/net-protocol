@@ -22,13 +22,14 @@ import (
 	"time"
 
 	"crypto/sha1"
+
 	"github.com/brewlin/net-protocol/pkg/rand"
+	"github.com/brewlin/net-protocol/pkg/seqnum"
 	"github.com/brewlin/net-protocol/pkg/sleep"
+	"github.com/brewlin/net-protocol/pkg/waiter"
 	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/protocol/header"
-	"github.com/brewlin/net-protocol/pkg/seqnum"
 	"github.com/brewlin/net-protocol/stack"
-	"github.com/brewlin/net-protocol/pkg/waiter"
 )
 
 const (
@@ -367,8 +368,10 @@ func (e *endpoint) handleListenSegment(ctx *listenContext, s *segment) {
 
 // protocolListenLoop is the main loop of a listening TCP endpoint. It runs in
 // its own goroutine and is responsible for handling connection requests.
+// tcp 监听主流程
 // protocolListenLoop 是侦听TCP端点的主循环。它在自己的goroutine中运行，负责处理连接请求。
 func (e *endpoint) protocolListenLoop(rcvWnd seqnum.Size) *tcpip.Error {
+	//事件循环后退出前做的收尾工作
 	defer func() {
 		// Mark endpoint as closed. This will prevent goroutines running
 		// handleSynSegment() from attempting to queue new connections

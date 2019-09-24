@@ -13,7 +13,6 @@ func Setup() {
 		panic(err)
 	}
 	log.SetOutput(logFile)
-	log.SetPrefix("[qSkipTool]")
 	log.SetFlags(log.Lshortfile)
 	return
 }

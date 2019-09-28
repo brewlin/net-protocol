@@ -1,38 +1,6 @@
-package main
-
-import (
-	"flag"
-	"fmt"
-	"log"
-	"net"
-	"os"
-	"strconv"
-	"strings"
-
-	"github.com/brewlin/net-protocol/pkg/logging"
-
-	"github.com/brewlin/net-protocol/protocol/link/fdbased"
-	"github.com/brewlin/net-protocol/protocol/link/tuntap"
-	"github.com/brewlin/net-protocol/protocol/transport/udp"
-
-	"github.com/brewlin/net-protocol/protocol/network/ipv6"
-
-	"github.com/brewlin/net-protocol/pkg/waiter"
-
-	"github.com/brewlin/net-protocol/protocol/network/arp"
-	"github.com/brewlin/net-protocol/protocol/network/ipv4"
-	"github.com/brewlin/net-protocol/protocol/transport/tcp"
-	"github.com/brewlin/net-protocol/stack"
-
-	tcpip "github.com/brewlin/net-protocol/protocol"
-)
-
-var mac = flag.String("mac", "aa:00:01:01:01:01", "mac address to use in tap device")
-
-func init() {
-	logging.Setup()
-}
-
+## tcp 实验
+### 新建网卡、启动网卡、添加协议
+```go
 func main() {
 	flag.Parse()
 	if len(flag.Args()) != 4 {
@@ -123,7 +91,10 @@ func main() {
 	tcpServer(s, addr, localPort)
 
 }
+```
 
+### 监听tcp端口，事件循环接收链接
+```go
 func tcpServer(s *stack.Stack, addr tcpip.Address, port int) {
 	var wq waiter.Queue
 	//新建一个tcp端
@@ -161,17 +132,28 @@ func tcpServer(s *stack.Stack, addr tcpip.Address, port int) {
 		go dispatch(n, q, addr)
 	}
 }
-func dispatch(e tcpip.Endpoint, wq *waiter.Queue, addr tcpip.FullAddress) {
+```
 
+### 为每一个tcp连接 分发一个协程处理
+```go
+func dispatch(e tcpip.Endpoint, wq *waiter.Queue, addr tcpip.FullAddress) {
+    //新建队列和通知，因为底层每一次新的连接accept到来，会重新分配 tcpip.Endpoint,然后需要重新初始化当前连接
 	waitEntry, notifyCh := waiter.NewChannelEntry(nil)
-	wq.EventRegister(&waitEntry, waiter.EventIn)
+    //注册事件
+    wq.EventRegister(&waitEntry, waiter.EventIn)
+    
 	defer wq.EventUnregister(&waitEntry)
+	defer e.Close()
 	for {
+        //读取数据
 		v, c, err := e.Read(&addr)
 		if err != nil {
 			if err == tcpip.ErrWouldBlock {
-				fmt.Println("@main dispatch: waiting new event trigger ...")
-				<-notifyCh
+                //表示队列里没有数据可以读取，
+                fmt.Println("@main dispatch: waiting new event trigger ...")
+                //阻塞等待通知
+                <-notifyCh
+                //表示有事件触发了， 取决于上面 wq.EventRegister(&waitEntry,waiter.EventIn)
 				continue
 			}
 			fmt.Println("@main dispatch:tcp read  got error", err)
@@ -181,5 +163,6 @@ func dispatch(e tcpip.Endpoint, wq *waiter.Queue, addr tcpip.FullAddress) {
 		a, b, er := e.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: &addr})
 		fmt.Println("@main dispatch: write to client res: ", a, b, er)
 	}
-	e.Close()
 }
+
+```

@@ -1,7 +1,36 @@
 # net-protocol
+<img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/brewlin/net-protocol">
+<img alt="GitHub" src="https://img.shields.io/github/license/brewlin/net-protocol">
+<img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/brewlin/net-protocol">
+
+
 基于go 实现链路层、网络层、传输层、应用层 网络协议栈 ，使用虚拟网卡实现
 
-## arp实验 `cmd/link/arp`
+## @application 应用层
+- [ ] http
+- [ ] websocket
+
+to do...
+
+## @transport 传输层
+- [x] tcp
+- [x] udp
+- [x] port 端口机制
+
+## @network 网络层
+- [x] icmp
+- [x] ipv4
+- [x] ipv6
+
+## @link 链路层
+- [x] arp
+- [x] ethernet
+
+## @物理层
+- [x] tun tap 虚拟网卡的实现
+
+## @demo 协议测试
+### arp实验 `cmd/link/arp`
 >在网卡的基础上注册了以太网 arp ip等协议，可以了解数据的整个解析和流程
 ![](./resource/e2.png)
 
@@ -58,7 +87,7 @@ main.go:37: recv :hello
 
 ```
 
-## tcp实验完整的协议栈流程处理 `cmd/tcp`
+### tcp实验完整的协议栈流程处理 `cmd/tcp`
 启动网卡，注册相关协议 以太网协议、arp协议、icmp协议、tcp协议、初始化端口池
 ```
 //tcp 测试基于本地环回网卡，
@@ -115,6 +144,6 @@ cd /cmd/tcp/client
 go build
 ./client
 ```
-## 网卡实验`cmd/link/tap`
+### 网卡实验`cmd/link/tap`
 >提供纯净的虚拟网卡实现，未注册任何协议，可以测试原始网卡的收发数据
 

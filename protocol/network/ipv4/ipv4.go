@@ -24,12 +24,12 @@ import (
 	"log"
 	"sync/atomic"
 
-	"github.com/brewlin/net-protocol/stack"
-	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/pkg/buffer"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/protocol/header"
 	"github.com/brewlin/net-protocol/protocol/network/fragmentation"
 	"github.com/brewlin/net-protocol/protocol/network/hash"
+	"github.com/brewlin/net-protocol/stack"
 )
 
 const (
@@ -123,7 +123,7 @@ func (e *endpoint) MaxHeaderLength() uint16 {
 // 将传输层的数据封装加上IP头，并调用网卡的写入接口，写入IP报文
 func (e *endpoint) WritePacket(r *stack.Route, hdr buffer.Prependable, payload buffer.VectorisedView,
 	protocol tcpip.TransportProtocolNumber, ttl uint8) *tcpip.Error {
-	// 预留ip报文的空间
+	// 预留ip报文的空间 在传输层头部加上ip头最少20字节预留
 	ip := header.IPv4(hdr.Prepend(header.IPv4MinimumSize))
 	length := uint16(hdr.UsedLength() + payload.Size())
 	id := uint32(0)

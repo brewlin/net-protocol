@@ -25,3 +25,87 @@ func newRequest() *http_request {
 	return req
 
 }
+//解析httprequest
+func (req *http_request)parse(con *connection){
+    buf := con.recv_buf
+
+    req.method_raw = match_until(&buf, " ")
+
+    if req.method_raw == "" {
+        con.status_code = 400
+        return;
+    }
+
+    // 获得HTTP方法
+    req.method = get_method(req.method_raw)
+
+    if req.method == HTTP_METHOD_NOT_SUPPORTED {
+        try_set_status(con, 501)
+    } else if(req.method == HTTP_METHOD_UNKNOWN) {
+        con.status_code = 400
+        return;
+    }
+
+    // 获得URI
+    req.uri = match_until(&buf, " \r\n")
+
+    if req.uri == "" {
+        con.status_code = 400
+        return
+    }
+
+    /*
+     * 判断访问的资源是否在服务器上
+     *
+     */
+    // if (resolve_uri(con.real_path, serv.conf.doc_root, req.uri) == -1) {
+        // try_set_status(con, 404);
+    // }
+
+    // 如果版本为HTTP_VERSION_09立刻退出
+    if req.version == HTTP_VERSION_09 {
+        try_set_status(con, 200)
+        req.version_raw = ""
+        return
+    }
+
+    // 获得HTTP版本
+    req.version_raw = match_until(&buf, "\r\n")
+
+    if req.version_raw == "" {
+        con.status_code = 400
+        return
+    }
+
+    // 支持HTTP/1.0或HTTP/1.1
+    if strcasecmp(req.version_raw, "HTTP/1.0") == 0 {
+        req.version = HTTP_VERSION_10
+    } else if strcasecmp(req.version_raw, "HTTP/1.1") == 0 {
+        req.version = HTTP_VERSION_11
+    } else {
+        try_set_status(con, 400)
+    }
+
+    if con.status_code > 0 {
+        return
+    }
+
+    // 解析HTTP请求头部
+
+    p := buf
+    endp := con.recv_buf + con.request_len
+
+    for p < endp {
+        key := match_until(&p, ": ")
+        value := match_until(&p, "\r\n")
+
+        if !key || !value {
+            con.status_code = 400;
+            return
+        }
+
+        http_headers_add(req.headers, key, value)
+    }
+
+    con.status_code = 200
+}

@@ -1,5 +1,9 @@
 package http
 
+import (
+    "strings"
+)
+
 // HTTP请求结构体，包含HTTP方法，版本，URI，HTTP头，内容长
 type http_request struct {
 	//http 请求方法
@@ -29,7 +33,7 @@ func newRequest() *http_request {
 func (req *http_request)parse(con *connection){
     buf := con.recv_buf
 
-    req.method_raw = match_until(&buf, " ")
+    req.method_raw = match_until(buf, " ")
 
     if req.method_raw == "" {
         con.status_code = 400
@@ -40,14 +44,14 @@ func (req *http_request)parse(con *connection){
     req.method = get_method(req.method_raw)
 
     if req.method == HTTP_METHOD_NOT_SUPPORTED {
-        try_set_status(con, 501)
+        con.set_status_code(501)
     } else if(req.method == HTTP_METHOD_UNKNOWN) {
         con.status_code = 400
         return;
     }
 
     // 获得URI
-    req.uri = match_until(&buf, " \r\n")
+    req.uri = match_until(buf, " \r\n")
 
     if req.uri == "" {
         con.status_code = 400
@@ -64,13 +68,13 @@ func (req *http_request)parse(con *connection){
 
     // 如果版本为HTTP_VERSION_09立刻退出
     if req.version == HTTP_VERSION_09 {
-        try_set_status(con, 200)
+        con.set_status_code(200)
         req.version_raw = ""
         return
     }
 
     // 获得HTTP版本
-    req.version_raw = match_until(&buf, "\r\n")
+    req.version_raw = match_until(buf, "\r\n")
 
     if req.version_raw == "" {
         con.status_code = 400
@@ -78,12 +82,12 @@ func (req *http_request)parse(con *connection){
     }
 
     // 支持HTTP/1.0或HTTP/1.1
-    if strcasecmp(req.version_raw, "HTTP/1.0") == 0 {
+    if strings.EqualFold(req.version_raw, "HTTP/1.0") {
         req.version = HTTP_VERSION_10
-    } else if strcasecmp(req.version_raw, "HTTP/1.1") == 0 {
+    } else if strings.EqualFold(req.version_raw, "HTTP/1.1") {
         req.version = HTTP_VERSION_11
     } else {
-        try_set_status(con, 400)
+        con.set_status_code(400)
     }
 
     if con.status_code > 0 {
@@ -96,15 +100,14 @@ func (req *http_request)parse(con *connection){
     endp := con.recv_buf + con.request_len
 
     for p < endp {
-        key := match_until(&p, ": ")
-        value := match_until(&p, "\r\n")
+        key := match_until(p, ": ")
+        value := match_until(p, "\r\n")
 
         if !key || !value {
             con.status_code = 400;
             return
         }
-
-        http_headers_add(req.headers, key, value)
+        req.headers.http_headers_add(key,value)
     }
 
     con.status_code = 200

@@ -75,7 +75,12 @@ func (con *connection) handler() {
 		log.Println("@应用层 http: write to client res: ", a, b, er)
 	}
 }
-
+// 设置状态
+func (c *connection)set_status_code(code int){
+	if c.status_code == 0 {
+		c.status_code = code
+	}
+}
 //关闭连接
 func (c *connection) close() {
 	if c == nil {

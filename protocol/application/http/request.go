@@ -103,7 +103,7 @@ func (req *http_request)parse(con *connection){
         key := match_until(p, ": ")
         value := match_until(p, "\r\n")
 
-        if !key || !value {
+        if key == "" || value == "" {
             con.status_code = 400;
             return
         }

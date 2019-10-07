@@ -36,3 +36,14 @@ const (
 	HTTP_RECV_STATE_LF
 	HTTP_RECV_STATE_LINE
 )
+
+const default_err_msg = "<HTML><HEAD><TITLE>ERROR</TITLE></HEAD><BODY><H1>SOMETING WRONG</H1></BODY></HTML>"
+
+
+var mime = map[string]string{
+    ".html" : "text/html",
+    ".css":"text/css",
+    ".js":"application/javascript",
+    ".jpg":"image/jpg",
+    ".png":"image/png",
+}

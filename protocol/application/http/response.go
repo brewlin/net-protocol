@@ -20,81 +20,85 @@ func newResponse() *http_response {
 	resp.content_length = -1
 	return resp
 }
+
 // 发送HTTP响应
-func (r *http_response) http_response_send(con *connection) {
-    if con.request.version == HTTP_VERSION_09 {
-        r.send_http09_response(con);
-    } else {
-        r.send_response(con);
-    }
+func (r *http_response) send(con *connection) {
+	if con.request.version == HTTP_VERSION_09 {
+		r.send_http09_response(con)
+	} else {
+		r.send_response(con)
+	}
 }
+
 /*
  * HTTP_VERSION_09时，只发送响应消息内容，不包含头部
  */
 func (r *http_response) send_http09_response(con *connection) {
 
-	// 检查文件是否可以访问 && check_file_attrs(con, con.real_path) 
+	// 检查文件是否可以访问 && check_file_attrs(con, con.real_path)
 	if con.status_code == 200 {
-        // read_file(r.entity_body, con.real_path);
-    } else {
-        // read_err_file(serv, con, r.entity_body);
-    }
+		// read_file(r.entity_body, con.real_path);
+	} else {
+		// read_err_file(serv, con, r.entity_body);
+	}
 
-    r.send_all(con, r.entity_body);
+	r.send_all(con, r.entity_body)
 }
+
 /*
  * 构建响应消息和消息头部并发送消息
  * 如果请求的资源无法打开则发送错误消息
  */
- func (r *http_response) send_response (con *connection) {
+func (r *http_response) send_response(con *connection) {
 	req := con.request
-	req.headers.http_headers_add("Server","cserver")
+	req.headers.http_headers_add("Server", "cserver")
 
+	if con.status_code != 200 {
+		// send_err_response(serv, con);
+		return
+	}
 
-    if con.status_code != 200 {
-        // send_err_response(serv, con);
-        return;
-    }
+	// if (check_file_attrs(con, con->real_path) == -1) {
+	// send_err_response(serv, con);
+	// return;
+	// }
 
-    // if (check_file_attrs(con, con->real_path) == -1) {
-        // send_err_response(serv, con);
-        // return;
-    // }
+	// if r.method != HTTP_METHOD_HEAD {
+	// read_file(resp->entity_body, con->real_path);
+	// }
 
-    // if r.method != HTTP_METHOD_HEAD {
-        // read_file(resp->entity_body, con->real_path);
-    // }
+	// 构建消息头部
+	// const char *mime = get_mime_type(con->real_path, "text/plain");
+	// http_headers_add(resp->headers, "Content-Type", mime);
+	// http_headers_add_int(resp->headers, "Content-Length", resp->content_length);
 
-    // 构建消息头部
-    // const char *mime = get_mime_type(con->real_path, "text/plain");
-    // http_headers_add(resp->headers, "Content-Type", mime);
-    // http_headers_add_int(resp->headers, "Content-Length", resp->content_length);
-
-    r.build_and_send_response(con);
+	r.build_and_send_response(con)
 }
+
 /*
  * 当出错时发送标准错误页面，页面名称类似404.html
  * 如果错误页面不存在则发送标准的错误消息
  */
-func (r *http_response) send_err_response (con *connection) {
-    // snprintf(err_file, sizeof(err_file), "%s/%d.html", serv->conf->doc_root, con->status_code);
+func (r *http_response) send_err_response(con *connection) {
+	// snprintf(err_file, sizeof(err_file), "%s/%d.html", serv->conf->doc_root, con->status_code);
 
-    // 检查错误页面
-    // if (check_file_attrs(con, err_file) == -1) {
-        // resp->content_length = strlen(default_err_msg);
-        // log_error(serv, "failed to open file %s", err_file);
-    // }
+	// 检查错误页面
+	// if (check_file_attrs(con, err_file) == -1) {
+	// resp->content_length = strlen(default_err_msg);
+	// log_error(serv, "failed to open file %s", err_file);
+	// }
 
 	// 构建消息头部
-	r.headers.http_headers_add("Content-Type", "text/html");
-	r.headers.http_headers_add("Content-Length", string(r.content_length));
+	r.headers.http_headers_add("Content-Type", "text/html")
+	r.headers.http_headers_add("Content-Length", string(r.content_length))
 
-    if con.request.method != HTTP_METHOD_HEAD {
-    //    read_err_file(serv, con, resp->entity_body);
-    }
+	if con.request.method != HTTP_METHOD_HEAD {
+		//    read_err_file(serv, con, resp->entity_body);
+	}
 
-    r.build_and_send_response(con);
+	r.build_and_send_response(con)
 }
+
 // 构建并发送响应
 func (r *http_response) build_and_send_response(con *connection) {
 
@@ -107,40 +111,40 @@ func (r *http_response) build_and_send_response(con *connection) {
 	buf += r.reason_phrase(con.status_code)
 	buf += "\r\n"
 
-	for k,v := range r.headers.ptr {
-			buf += k
-			buf += ": "
-			buf += v
-			buf += "\r\n"
+	for k, v := range r.headers.ptr {
+		buf += k
+		buf += ": "
+		buf += v
+		buf += "\r\n"
 	}
 	buf += r.entity_body
-    // 将字符串缓存发送到客户端
-    r.send_all(con, buf);
+	// 将字符串缓存发送到客户端
+	r.send_all(con, buf)
 }
+
 //根据状态码构建响应结构中的状态消息
-func (r *http_response) reason_phrase(status_code int)string{
-    switch status_code {
-        case 200:
-            return "ok";
-        case 400:
-            return "Bad Request";
-        case 403:
-            return "Forbidden";
-        case 404:
-            return "Not Found";
-        case 500:
-            return "Internal Server Error";
-        case 501:
-            return "Not Implemened";
-    }
-    return "";
+func (r *http_response) reason_phrase(status_code int) string {
+	switch status_code {
+	case 200:
+		return "ok"
+	case 400:
+		return "Bad Request"
+	case 403:
+		return "Forbidden"
+	case 404:
+		return "Not Found"
+	case 500:
+		return "Internal Server Error"
+	case 501:
+		return "Not Implemened"
+	}
+	return ""
 }
+
 /**
  * 将响应消息发送给客户端
  */
- func (r *http_response)send_all (con *connection,buf string){
+func (r *http_response) send_all(con *connection, buf string) {
 	v := buffer.View(buf)
-	a, b, er := con.socket.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: con.addr})
+	con.socket.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: con.addr})
 }
-
-

@@ -45,6 +45,7 @@ func newCon(e tcpip.Endpoint, q *waiter.Queue) *connection {
 	con.response = newResponse()
 	con.recv_buf = ""
 	addr, _ := e.GetRemoteAddress()
+	log.Println("@application http: new client connection : ", addr)
 	con.addr = &addr
 	con.waitEntry, con.notifyC = waiter.NewChannelEntry(nil)
 	q.EventRegister(&con.waitEntry, waiter.EventIn)
@@ -70,17 +71,21 @@ func (con *connection) handler() {
 			log.Println("@应用层 http:tcp read  got error", err)
 			break
 		}
-		log.Println("@应用层 http: recv ", v, cc)
-		a, b, er := con.socket.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: con.addr})
-		log.Println("@应用层 http: write to client res: ", a, b, er)
+		log.Println("@应用层 http: recv ", string(v), cc)
+		con.recv_buf = string(v)
+		newRequest().parse(con)
+		newResponse().send(con)
+		break
 	}
 }
+
 // 设置状态
-func (c *connection)set_status_code(code int){
+func (c *connection) set_status_code(code int) {
 	if c.status_code == 0 {
 		c.status_code = code
 	}
 }
+
 //关闭连接
 func (c *connection) close() {
 	if c == nil {
@@ -95,4 +100,5 @@ func (c *connection) close() {
 	c = nil
 	//注销接受队列
 	c.q.EventUnregister(&c.waitEntry)
+	c.socket.Close()
 }

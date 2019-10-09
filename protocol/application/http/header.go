@@ -9,12 +9,16 @@ type http_headers struct {
 }
 
 func newHeaders() *http_headers {
-	var h *http_headers
+	h := new(http_headers)
+	h.ptr = make(map[string]string)
+	h.len = 0
+	h.size = 0
 	return h
 }
+
 //添加新的key-value对到HTTP头部
-func (h *http_headers)http_headers_add(key,value string){
+func (h *http_headers) http_headers_add(key, value string) {
 
 	h.ptr[key] = value
-    h.len++;
+	h.len++
 }

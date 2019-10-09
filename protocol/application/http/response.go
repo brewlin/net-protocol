@@ -1,6 +1,10 @@
 package http
 
 import (
+	"fmt"
+
+	"strconv"
+
 	"github.com/brewlin/net-protocol/pkg/buffer"
 	tcpip "github.com/brewlin/net-protocol/protocol"
 )
@@ -13,12 +17,12 @@ type http_response struct {
 }
 
 func newResponse() *http_response {
-	var resp *http_response
+	var resp http_response
 
 	resp.headers = newHeaders()
 	resp.entity_body = ""
 	resp.content_length = -1
-	return resp
+	return &resp
 }
 
 // 发送HTTP响应
@@ -50,11 +54,13 @@ func (r *http_response) send_http09_response(con *connection) {
  * 如果请求的资源无法打开则发送错误消息
  */
 func (r *http_response) send_response(con *connection) {
-	req := con.request
-	req.headers.http_headers_add("Server", "cserver")
+	h := r.headers
+	h.http_headers_add("Server", "github.com/brewlin/net-protocol/1.00")
+	h.http_headers_add("Connection", "close")
+	r.entity_body = default_success_msg
 
 	if con.status_code != 200 {
-		// send_err_response(serv, con);
+		r.send_err_response(con)
 		return
 	}
 
@@ -87,14 +93,15 @@ func (r *http_response) send_err_response(con *connection) {
 	// resp->content_length = strlen(default_err_msg);
 	// log_error(serv, "failed to open file %s", err_file);
 	// }
+	r.entity_body = default_err_msg
 
 	// 构建消息头部
 	r.headers.http_headers_add("Content-Type", "text/html")
 	r.headers.http_headers_add("Content-Length", string(r.content_length))
 
-	if con.request.method != HTTP_METHOD_HEAD {
-		//    read_err_file(serv, con, resp->entity_body);
-	}
+	// if con.request.method != HTTP_METHOD_HEAD {
+	//    read_err_file(serv, con, resp->entity_body);
+	// }
 
 	r.build_and_send_response(con)
 }
@@ -105,19 +112,21 @@ func (r *http_response) build_and_send_response(con *connection) {
 	// 构建发送的字符串
 	buf := ""
 
-	buf += "HTTP/1.0 "
-	buf += string(con.status_code)
+	buf += con.request.version_raw + " "
+	buf += strconv.Itoa(con.status_code)
 	buf += " "
 	buf += r.reason_phrase(con.status_code)
 	buf += "\r\n"
-
 	for k, v := range r.headers.ptr {
 		buf += k
 		buf += ": "
 		buf += v
 		buf += "\r\n"
 	}
+	buf += "\r\n"
 	buf += r.entity_body
+	fmt.Println("@application http:response send 构建http响应包体")
+	fmt.Println(buf)
 	// 将字符串缓存发送到客户端
 	r.send_all(con, buf)
 }

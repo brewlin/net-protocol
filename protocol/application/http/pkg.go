@@ -11,16 +11,16 @@ func match_until(buf, delims string) (string, string) {
 	if i == -1 {
 		return "", ""
 	}
-	return buf[:i], buf[i:]
+	return buf[:i], buf[i+len(delims):]
 }
 
 // 根据字符串获得请求中的HTTP方法，目前只支持GET和HEAD
 func get_method(method string) http_method {
-	if strings.EqualFold(method, "GET") {
+	if method == "GET" {
 		return HTTP_METHOD_GET
-	} else if strings.EqualFold(method, "HEAD") {
+	} else if method == "HEAD" {
 		return HTTP_METHOD_HEAD
-	} else if strings.EqualFold(method, "POST") || strings.EqualFold(method, "PUT") {
+	} else if method == "POST" || method == "PUT" {
 		return HTTP_METHOD_NOT_SUPPORTED
 	}
 	return HTTP_METHOD_UNKNOWN

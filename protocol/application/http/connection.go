@@ -16,9 +16,9 @@ type connection struct {
 	// 接收队列
 	recv_buf string
 	// HTTP请求
-	request *http_request
+	request *Request
 	// HTTP响应
-	response *http_response
+	response *Response
 	// 接收状态
 	recv_state http_recv_state
 	// 客户端地址信息
@@ -78,6 +78,7 @@ func (con *connection) handler() {
 	fmt.Println("http协议原始数据:")
 	fmt.Println(con.recv_buf)
 	con.request.parse(con)
+	defaultMux.dispatch(con)
 	con.response.send(con)
 }
 

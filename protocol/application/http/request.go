@@ -6,7 +6,7 @@ import (
 )
 
 // HTTP请求结构体，包含HTTP方法，版本，URI，HTTP头，内容长
-type http_request struct {
+type Request struct {
 	//http 请求方法
 	method http_method
 	//http 版本
@@ -21,8 +21,8 @@ type http_request struct {
 }
 
 //初始化一个httprequest
-func newRequest() *http_request {
-	var req http_request
+func newRequest() *Request {
+	var req Request
 	req.content_length = 0
 	req.version = HTTP_VERSION_UNKNOWN
 	req.content_length = -1
@@ -32,7 +32,7 @@ func newRequest() *http_request {
 }
 
 //解析httprequest
-func (req *http_request) parse(con *connection) {
+func (req *Request) parse(con *connection) {
 	buf := con.recv_buf
 
 	req.method_raw, buf = match_until(buf, " ")

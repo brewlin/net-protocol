@@ -10,14 +10,14 @@ import (
 )
 
 // HTTP响应结构体，包含内容长度，内容，HTTP头部
-type http_response struct {
+type Response struct {
 	content_length int
 	entity_body    string
 	headers        *http_headers
 }
 
-func newResponse() *http_response {
-	var resp http_response
+func newResponse() *Response {
+	var resp Response
 
 	resp.headers = newHeaders()
 	resp.entity_body = ""
@@ -26,7 +26,7 @@ func newResponse() *http_response {
 }
 
 // 发送HTTP响应
-func (r *http_response) send(con *connection) {
+func (r *Response) send(con *connection) {
 	if con.request.version == HTTP_VERSION_09 {
 		r.send_http09_response(con)
 	} else {
@@ -37,7 +37,7 @@ func (r *http_response) send(con *connection) {
 /*
  * HTTP_VERSION_09时，只发送响应消息内容，不包含头部
  */
-func (r *http_response) send_http09_response(con *connection) {
+func (r *Response) send_http09_response(con *connection) {
 
 	// 检查文件是否可以访问 && check_file_attrs(con, con.real_path)
 	if con.status_code == 200 {
@@ -53,11 +53,13 @@ func (r *http_response) send_http09_response(con *connection) {
  * 构建响应消息和消息头部并发送消息
  * 如果请求的资源无法打开则发送错误消息
  */
-func (r *http_response) send_response(con *connection) {
+func (r *Response) send_response(con *connection) {
 	h := r.headers
 	h.http_headers_add("Server", "github.com/brewlin/net-protocol/1.00")
 	h.http_headers_add("Connection", "close")
-	r.entity_body = default_success_msg
+	if r.entity_body == "" {
+		r.entity_body = default_success_msg
+	}
 
 	if con.status_code != 200 {
 		r.send_err_response(con)
@@ -81,11 +83,16 @@ func (r *http_response) send_response(con *connection) {
 	r.build_and_send_response(con)
 }
 
+//End send the body
+func (r *Response) End(buf string) {
+	r.entity_body = buf
+}
+
 /*
  * 当出错时发送标准错误页面，页面名称类似404.html
  * 如果错误页面不存在则发送标准的错误消息
  */
-func (r *http_response) send_err_response(con *connection) {
+func (r *Response) send_err_response(con *connection) {
 	// snprintf(err_file, sizeof(err_file), "%s/%d.html", serv->conf->doc_root, con->status_code);
 
 	// 检查错误页面
@@ -107,7 +114,7 @@ func (r *http_response) send_err_response(con *connection) {
 }
 
 // 构建并发送响应
-func (r *http_response) build_and_send_response(con *connection) {
+func (r *Response) build_and_send_response(con *connection) {
 
 	// 构建发送的字符串
 	buf := ""
@@ -132,7 +139,7 @@ func (r *http_response) build_and_send_response(con *connection) {
 }
 
 //根据状态码构建响应结构中的状态消息
-func (r *http_response) reason_phrase(status_code int) string {
+func (r *Response) reason_phrase(status_code int) string {
 	switch status_code {
 	case 200:
 		return "ok"
@@ -153,7 +160,7 @@ func (r *http_response) reason_phrase(status_code int) string {
 /**
  * 将响应消息发送给客户端
  */
-func (r *http_response) send_all(con *connection, buf string) {
+func (r *Response) send_all(con *connection, buf string) {
 	v := buffer.View(buf)
 	con.socket.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: con.addr})
 }

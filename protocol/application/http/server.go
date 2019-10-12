@@ -161,5 +161,5 @@ func (s *Server) dispatch(e tcpip.Endpoint, wq *waiter.Queue) {
 	con := newCon(e, wq)
 	con.handler()
 	fmt.Println("@application http: dispatch  close this request")
-	con.close()
+	con.Close()
 }

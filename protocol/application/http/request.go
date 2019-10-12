@@ -32,7 +32,7 @@ func newRequest() *Request {
 }
 
 //解析httprequest
-func (req *Request) parse(con *connection) {
+func (req *Request) parse(con *Connection) {
 	buf := con.recv_buf
 
 	req.method_raw, buf = match_until(buf, " ")
@@ -117,4 +117,17 @@ func (req *Request) parse(con *connection) {
 	}
 
 	con.status_code = 200
+}
+
+//GetMethod d
+func (req *Request) GetMethod() string {
+	return req.method_raw
+}
+
+//GetHeader header
+func (req *Request) GetHeader(h string) string {
+	if _, exist := req.headers.ptr[h]; !exist {
+		return ""
+	}
+	return req.headers.ptr[h]
 }

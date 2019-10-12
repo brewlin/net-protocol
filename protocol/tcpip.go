@@ -57,6 +57,9 @@ type Error struct {
 func (e *Error) String() string {
 	return e.msg
 }
+func (e *Error) Error() string {
+	return e.msg
+}
 
 // IgnoreStats indicates whether this error type should be included in failure
 // counts in tcpip.Stats structs.

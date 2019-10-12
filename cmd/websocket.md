@@ -1,16 +1,17 @@
-package main
+# websocket协议
+```
+基于http协议，封装websocket协议， 接管http流程
+```
+## start
+```
+cd application/websocket
+go build
+sudo ./websocket
 
-import (
-	"log"
 
-	"github.com/brewlin/net-protocol/pkg/logging"
-	"github.com/brewlin/net-protocol/protocol/application/http"
-	"github.com/brewlin/net-protocol/protocol/application/websocket"
-)
-
-func init() {
-	logging.Setup()
-}
+```
+## @websocketserver.go
+```
 func main() {
 	serv := http.NewHTTP("tap1", "192.168.1.0/24", "192.168.1.1", "9502")
 	serv.HandleFunc("/websocket", echo)
@@ -41,3 +42,5 @@ func echo(r *http.Request, w *http.Response) {
 		c.SendData(message)
 	}
 }
+
+```

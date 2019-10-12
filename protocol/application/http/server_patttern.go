@@ -25,7 +25,7 @@ func NewMuxEntry(pattern string, handler func(*Request, *Response)) muxEntry {
 var defaultMux ServeMux
 
 //handle
-func (mu *ServeMux) dispatch(con *connection) {
+func (mu *ServeMux) dispatch(con *Connection) {
 	if _, exist := defaultMux.m[con.request.uri]; !exist {
 		con.set_status_code(400)
 		return

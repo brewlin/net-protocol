@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/brewlin/net-protocol/pkg/buffer"
 	"github.com/brewlin/net-protocol/pkg/waiter"
 	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
-type connection struct {
+type Connection struct {
 	// 客户端连接的socket
 	socket tcpip.Endpoint
 	// 状态码
@@ -34,8 +35,8 @@ type connection struct {
 }
 
 //等待并接受新的连接
-func newCon(e tcpip.Endpoint, q *waiter.Queue) *connection {
-	var con connection
+func newCon(e tcpip.Endpoint, q *waiter.Queue) *Connection {
+	var con Connection
 	//创建结构实例
 	con.status_code = 0
 	con.request_len = 0
@@ -43,7 +44,7 @@ func newCon(e tcpip.Endpoint, q *waiter.Queue) *connection {
 	con.real_path = ""
 	con.recv_state = HTTP_RECV_STATE_WORD1
 	con.request = newRequest()
-	con.response = newResponse()
+	con.response = newResponse(&con)
 	con.recv_buf = ""
 	addr, _ := e.GetRemoteAddress()
 	log.Println("@application http: new client connection : ", addr)
@@ -60,7 +61,7 @@ func newCon(e tcpip.Endpoint, q *waiter.Queue) *connection {
 //解析请求
 //发送响应
 //记录请求日志
-func (con *connection) handler() {
+func (con *Connection) handler() {
 	<-con.notifyC
 	log.Println("@应用层 http: waiting new event trigger ...")
 	fmt.Println("@应用层 http: waiting new event trigger ...")
@@ -78,19 +79,39 @@ func (con *connection) handler() {
 	fmt.Println("http协议原始数据:")
 	fmt.Println(con.recv_buf)
 	con.request.parse(con)
+	//dispatch the route request
 	defaultMux.dispatch(con)
-	con.response.send(con)
+	con.response.send()
 }
 
 // 设置状态
-func (c *connection) set_status_code(code int) {
+func (c *Connection) set_status_code(code int) {
 	if c.status_code == 0 {
 		c.status_code = code
 	}
 }
 
+//Write write
+func (c *Connection) Write(buf []byte) *tcpip.Error {
+	v := buffer.View(buf)
+	_, _, err := c.socket.Write(tcpip.SlicePayload(v),
+		tcpip.WriteOptions{To: c.addr})
+	return err
+}
+
+//Read data
+func (c *Connection) Read(p []byte) (int, error) {
+	buf, _, err := c.socket.Read(c.addr)
+	if err != nil {
+		return 0, err
+	}
+	n := copy(p, buf)
+	return n, nil
+
+}
+
 //关闭连接
-func (c *connection) close() {
+func (c *Connection) Close() {
 	if c == nil {
 		return
 	}

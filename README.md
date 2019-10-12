@@ -14,24 +14,15 @@
 ```
 `./cmd/*.md`
 ## @application 应用层
-```
-应用层协议开发，基于tcp 封装http协议，基于http协议封装websocket协议
-```
 - [x] http [docs](./cmd/http.md)
 - [ ] websocket [docs](./cmd/websocket.md)
 
 ## @transport 传输层
-```
-传输层协议开发、基于ip协议封装tcp、udp协议，以及端口管理机制。
-```
 - [x] tcp [docs](./cmd/tcp.md)
 - [x] udp [docs](./cmd/udp.md)
 - [x] port 端口机制
 
 ## @network 网络层
-```
-网络层协议开发,封装ipv4、ipv6
-```
 - [x] icmp
 - [x] ipv4
 - [x] ipv6

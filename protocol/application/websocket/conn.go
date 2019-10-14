@@ -3,7 +3,6 @@ package websocket
 import (
 	"encoding/binary"
 	"errors"
-	"fmt"
 	"log"
 
 	"github.com/brewlin/net-protocol/protocol/application/http"
@@ -67,7 +66,7 @@ func (c *Conn) SendData(data []byte) {
 	 * =>      1 0 0 0 0 0 0 1
 	 */
 	c.writeBuf[0] = byte(TextMessage) | finalBit
-	fmt.Printf("1 bit:%b\n", c.writeBuf[0])
+	log.Printf("1 bit:%b\n", c.writeBuf[0])
 
 	//数据帧第二个字节，服务器发送的数据不需要进行掩码处理
 	switch {
@@ -88,7 +87,7 @@ func (c *Conn) SendData(data []byte) {
 		//c.writeBuf[1] = byte(0x00) | byte(length)
 		c.writeBuf[1] = byte(length)
 	}
-	fmt.Printf("2 bit:%b\n", c.writeBuf[1])
+	log.Printf("2 bit:%b\n", c.writeBuf[1])
 
 	copy(c.writeBuf[payloadStart:], data[:])
 	c.conn.Write(c.writeBuf[:payloadStart+length])
@@ -98,12 +97,12 @@ func (c *Conn) SendData(data []byte) {
 func (c *Conn) ReadData() (data []byte, err error) {
 	var b [8]byte
 	//读取数据帧的前两个字节
-	if _, err := c.conn.Read(b[:2]); err != nil {
+	if _, err := c.conn.Readn(b[:2]); err != nil {
 		return nil, err
 	}
 	//开始解析第一个字节 是否还有后续数据帧
 	final := b[0]&finalBit != 0
-	fmt.Printf("read data 1 bit :%b\n", b[0])
+	log.Printf("read data 1 bit :%b\n", b[0])
 	//不支持数据分片
 	if !final {
 		log.Println("Recived fragemented frame,not support")
@@ -138,13 +137,13 @@ func (c *Conn) ReadData() (data []byte, err error) {
 	//根据payload length 判断数据的真实长度
 	switch payloadLen {
 	case 126: //扩展2字节
-		if _, err := c.conn.Read(b[:2]); err != nil {
+		if _, err := c.conn.Readn(b[:2]); err != nil {
 			return nil, err
 		}
 		//获取扩展二字节的真实数据长度
 		dataLen = int64(binary.BigEndian.Uint16(b[:2]))
 	case 127:
-		if _, err := c.conn.Read(b[:8]); err != nil {
+		if _, err := c.conn.Readn(b[:8]); err != nil {
 			return nil, err
 		}
 		dataLen = int64(binary.BigEndian.Uint64(b[:8]))
@@ -154,13 +153,13 @@ func (c *Conn) ReadData() (data []byte, err error) {
 	//读取mask key
 	if mask { //如果需要掩码处理的话 需要取出key
 		//maskKey 是 4 字节  32位
-		if _, err := c.conn.Read(c.maskKey[:]); err != nil {
+		if _, err := c.conn.Readn(c.maskKey[:]); err != nil {
 			return nil, err
 		}
 	}
 	//读取数据内容
 	p := make([]byte, dataLen)
-	if _, err := c.conn.Read(p); err != nil {
+	if _, err := c.conn.Readn(p); err != nil {
 		return nil, err
 	}
 	if mask {

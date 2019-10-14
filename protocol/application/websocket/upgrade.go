@@ -2,6 +2,7 @@ package websocket
 
 import (
 	"errors"
+	"fmt"
 	"log"
 
 	"github.com/brewlin/net-protocol/protocol/application/http"
@@ -14,13 +15,13 @@ func Upgrade(r *http.Request, w *http.Response) (c *Conn, err error) {
 		return nil, errors.New("websocket:method not GET")
 	}
 	//检查 Sec-WebSocket-Version 版本
-	if values := r.GetHeader("Sec-Websocket-Version"); values == "" || values != "13" {
+	if values := r.GetHeader("Sec-WebSocket-Version"); values == "" || values != "13" {
 		w.Error(http.StatusBadRequest)
 		return nil, errors.New("websocket:version != 13")
 	}
 
 	//检查Connection 和  Upgrade
-	if values := r.GetHeader("Connection"); values != "upgrade" {
+	if values := r.GetHeader("Connection"); !tokenListContainsValue(values, "upgrade") {
 		w.Error(http.StatusBadRequest)
 		return nil, errors.New("websocket:could not find connection header with token 'upgrade'")
 	}
@@ -30,7 +31,7 @@ func Upgrade(r *http.Request, w *http.Response) (c *Conn, err error) {
 	}
 
 	//计算Sec-Websocket-Accept的值
-	challengeKey := r.GetHeader("Sec-Websocket-Key")
+	challengeKey := r.GetHeader("Sec-WebSocket-Key")
 	if challengeKey == "" {
 		w.Error(http.StatusBadRequest)
 		return nil, errors.New("websocket:key missing or blank")
@@ -45,6 +46,8 @@ func Upgrade(r *http.Request, w *http.Response) (c *Conn, err error) {
 	p = append(p, "\r\n\r\n"...)
 	//返回repson 但不关闭连接
 	if err = con.Write(p); err != nil {
+		fmt.Println(err == nil)
+		fmt.Println("write p err", err)
 		return nil, err
 	}
 	//升级为websocket

@@ -14,14 +14,6 @@ type muxEntry struct {
 	pattern string
 }
 
-//NewMuxEntry entry
-func NewMuxEntry(pattern string, handler func(*Request, *Response)) muxEntry {
-	var entry muxEntry
-	entry.h = handler
-	entry.pattern = pattern
-	return entry
-}
-
 var defaultMux ServeMux
 
 //handle

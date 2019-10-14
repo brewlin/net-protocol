@@ -2,7 +2,6 @@ package http
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net"
 	"strconv"
@@ -144,11 +143,10 @@ func (s *Server) ListenAndServ() {
 		if err != nil {
 			if err == tcpip.ErrWouldBlock {
 				log.Println("@application http:", " now waiting to new client connection ...")
-				fmt.Println("@application http:", " now waiting to new client connection ...")
 				<-notifyCh
 				continue
 			}
-			fmt.Println("@application http: Accept() failed: ", err)
+			log.Println("@application http: Accept() failed: ", err)
 			panic(err)
 		}
 
@@ -157,9 +155,9 @@ func (s *Server) ListenAndServ() {
 }
 
 func (s *Server) dispatch(e tcpip.Endpoint, wq *waiter.Queue) {
-	fmt.Println("@application http: dispatch  got new request")
+	log.Println("@application http: dispatch  got new request")
 	con := newCon(e, wq)
 	con.handler()
-	fmt.Println("@application http: dispatch  close this request")
+	log.Println("@application http: dispatch  close this request")
 	con.Close()
 }

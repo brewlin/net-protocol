@@ -1,8 +1,9 @@
 package http
 
 import (
-	"fmt"
+	"errors"
 	"log"
+	"sync"
 
 	"github.com/brewlin/net-protocol/pkg/buffer"
 	"github.com/brewlin/net-protocol/pkg/waiter"
@@ -28,6 +29,10 @@ type Connection struct {
 	request_len int
 	// 请求文件的真实路径
 	real_path string
+
+	//接受队列缓存区
+	buf   buffer.View
+	bufmu sync.RWMutex
 
 	q         *waiter.Queue
 	waitEntry waiter.Entry
@@ -64,7 +69,6 @@ func newCon(e tcpip.Endpoint, q *waiter.Queue) *Connection {
 func (con *Connection) handler() {
 	<-con.notifyC
 	log.Println("@应用层 http: waiting new event trigger ...")
-	fmt.Println("@应用层 http: waiting new event trigger ...")
 	for {
 		v, _, err := con.socket.Read(con.addr)
 		if err != nil {
@@ -76,8 +80,8 @@ func (con *Connection) handler() {
 		}
 		con.recv_buf += string(v)
 	}
-	fmt.Println("http协议原始数据:")
-	fmt.Println(con.recv_buf)
+	log.Println("http协议原始数据:")
+	log.Println(con.recv_buf)
 	con.request.parse(con)
 	//dispatch the route request
 	defaultMux.dispatch(con)
@@ -92,22 +96,63 @@ func (c *Connection) set_status_code(code int) {
 }
 
 //Write write
-func (c *Connection) Write(buf []byte) *tcpip.Error {
+func (c *Connection) Write(buf []byte) error {
 	v := buffer.View(buf)
-	_, _, err := c.socket.Write(tcpip.SlicePayload(v),
+	c.socket.Write(tcpip.SlicePayload(v),
 		tcpip.WriteOptions{To: c.addr})
-	return err
+	return nil
 }
 
 //Read data
-func (c *Connection) Read(p []byte) (int, error) {
-	buf, _, err := c.socket.Read(c.addr)
-	if err != nil {
-		return 0, err
-	}
-	n := copy(p, buf)
-	return n, nil
+func (c *Connection) Read() ([]byte, error) {
 
+	var buf []byte
+	var err error
+	for {
+		v, _, e := c.socket.Read(c.addr)
+		if e != nil {
+			err = e
+			break
+		}
+		buf = append(buf, v...)
+	}
+	if buf == nil {
+		return nil, err
+	}
+	return buf, nil
+
+}
+
+//Readn  读取固定字节的数据
+func (c *Connection) Readn(p []byte) (int, error) {
+	c.bufmu.Lock()
+	defer c.bufmu.Unlock()
+	//获取足够长度的字节
+	if len(p) > len(c.buf) {
+
+		for {
+			if len(p) <= len(c.buf) {
+				break
+			}
+			buf, _, err := c.socket.Read(c.addr)
+			if err != nil {
+				if err == tcpip.ErrWouldBlock {
+					//阻塞等待数据
+					<-c.notifyC
+					continue
+				}
+				return 0, err
+			}
+			c.buf = append(c.buf, buf...)
+		}
+	}
+	if len(p) > len(c.buf) {
+		return 0, errors.New("package len is smaller than p need")
+	}
+
+	n := copy(p, c.buf)
+	c.buf = c.buf[len(p):]
+	return n, nil
 }
 
 //关闭连接

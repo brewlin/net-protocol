@@ -1,7 +1,7 @@
 package http
 
 import (
-	"fmt"
+	"log"
 	"strings"
 )
 
@@ -36,7 +36,7 @@ func (req *Request) parse(con *Connection) {
 	buf := con.recv_buf
 
 	req.method_raw, buf = match_until(buf, " ")
-	fmt.Println("@application http: header parse method_raw:", req.method_raw)
+	log.Println("@application http: header parse method_raw:", req.method_raw)
 
 	if req.method_raw == "" {
 		con.status_code = 400
@@ -45,7 +45,7 @@ func (req *Request) parse(con *Connection) {
 
 	// 获得HTTP方法
 	req.method = get_method(req.method_raw)
-	fmt.Println("@application http: header parse method:", req.method)
+	log.Println("@application http: header parse method:", req.method)
 
 	if req.method == HTTP_METHOD_NOT_SUPPORTED {
 		con.set_status_code(501)
@@ -56,7 +56,7 @@ func (req *Request) parse(con *Connection) {
 
 	// 获得URI
 	req.uri, buf = match_until(buf, " ")
-	fmt.Println("@application http: header parse uri:", req.uri)
+	log.Println("@application http: header parse uri:", req.uri)
 
 	if req.uri == "" {
 		con.status_code = 400
@@ -80,7 +80,7 @@ func (req *Request) parse(con *Connection) {
 
 	// 获得HTTP版本
 	req.version_raw, buf = match_until(buf, "\r\n")
-	fmt.Println("@application http: header parse version_raw:", req.version_raw)
+	log.Println("@application http: header parse version_raw:", req.version_raw)
 
 	if req.version_raw == "" {
 		con.status_code = 400
@@ -95,8 +95,8 @@ func (req *Request) parse(con *Connection) {
 	} else {
 		con.set_status_code(400)
 	}
-	fmt.Println("@application http: header parse version:", req.version)
-	fmt.Println("@application http: header parse status_code:", con.status_code)
+	log.Println("@application http: header parse version:", req.version)
+	log.Println("@application http: header parse status_code:", con.status_code)
 	if con.status_code > 0 {
 		return
 	}

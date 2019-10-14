@@ -15,7 +15,7 @@
 `./cmd/*.md`
 ## @application 应用层
 - [x] http [docs](./cmd/http.md)
-- [ ] websocket [docs](./cmd/websocket.md)
+- [x] websocket [docs](./cmd/websocket.md)
 
 ## @transport 传输层
 - [x] tcp [docs](./cmd/tcp.md)

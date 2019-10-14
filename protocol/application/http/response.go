@@ -1,7 +1,7 @@
 package http
 
 import (
-	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/brewlin/net-protocol/pkg/buffer"
@@ -133,8 +133,8 @@ func (r *Response) build_and_send_response() {
 	}
 	buf += "\r\n"
 	buf += r.entity_body
-	fmt.Println("@application http:response send 构建http响应包体")
-	fmt.Println(buf)
+	log.Println("@application http:response send 构建http响应包体")
+	log.Println(buf)
 	// 将字符串缓存发送到客户端
 	r.send_all(buf)
 }

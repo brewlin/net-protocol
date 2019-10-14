@@ -470,6 +470,7 @@ func (e *endpoint) Read(*tcpip.FullAddress) (buffer.View, tcpip.ControlMessages,
 }
 
 // 从tcp的接收队列中读取数据，并从接收队列中删除已读数据
+// tcp 队列是切片
 func (e *endpoint) readLocked() (buffer.View, *tcpip.Error) {
 	if e.rcvBufUsed == 0 {
 		if e.rcvClosed || e.state != stateConnected {

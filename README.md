@@ -3,7 +3,7 @@
 <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/brewlin/net-protocol">
 <img alt="GitHub" src="https://img.shields.io/github/license/brewlin/net-protocol">
 <img alt="GitHub code size in bytes" src="https://img.shields.io/github/languages/code-size/brewlin/net-protocol">
-  
+  <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/brewlin/net-protocol">
   </p>
 
 

@@ -36,38 +36,77 @@
 
 ## 协议相关api
 ### 1.应用层相关协议
-> 应用层暂时只实现了http、websocket、等文本协议。都基于tcp实现，对tcp等进行二次封装
+应用层暂时只实现了`http`、`websocket`等文本协议。都基于tcp、对tcp等进行二次封装
 
-[`http`](./cmd/http.md):
+[http api](./http-api.md) :`http-api.md`
 ```
-//新建一个初始化server，（底层 会创建一个tap网卡并注册 路由，arp缓存等），初始化端口机制，添加9502到端口表
-serv := http.NewHTTP("tap1", "192.168.1.0/24", "192.168.1.1", "9502")
-//添加路由，当对应请求到来时，分发到自定义回调函数中处理
-serv.HandleFunc("/", func(request *http.Request, response *http.Response) 
-//赋值给将要发送响应给客户端的 buf
-Response.End("string");
-//启动监听网卡、启动tcp、启动dispatch 分发事件并阻塞 等待client连接。。
-serv.ListenAndServ()
+	http 协议报文
+	GET /chat HTTP/1.1
+	Host: server.example.com
+	Upgrade: websocket
+	Connection: Upgrade
+	Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+	Origin: http://example.com
+	Sec-WebSocket-Protcol: chat, superchat
+	Sec-WebSocket-Version: 13
 ```
-[`websocket`](./cmd/websocket):初始化阶段和`httpserver`一致、新建httpserver、设置路由、启动监听服务
+[websocket api](./websocket-api.md) : `websocket-api.md`
 ```
-// r *http.Request, w *http.Response
-// Upgrade 为校验websocket协议， 并将http协议升级为websocket协议。并接管http协议流程，直接进行tcp通讯保持连接，
-c, err := websocket.Upgrade(r, w)
+			websocket 数据帧报文
 
-	//循环处理数据，接受数据，然后返回
-	for {
-    //读取客户端数据，该方法一直阻塞直到收到客户端数据，会触发通道取消阻塞
-		message, err := c.ReadData()
-    //发送数据给客户端，封装包头包体，调用tcpWrite 封装tcp包头，写入网络层 封装ip包头、写入链路层 封装以太网包头、写入网卡
-		c.SendData([]byte("hello"))
-	}
-```
+      0                   1                   2                   3
+      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+     +-+-+-+-+-------+-+-------------+-------------------------------+
+     |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+     |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+     |N|V|V|V|       |S|             |   (if payload len==126/127)   |
+     | |1|2|3|       |K|             |                               |
+     +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+     |     Extended payload length continued, if payload len == 127  |
+     + - - - - - - - - - - - - - - - +-------------------------------+
+     |                               |Masking-key, if MASK set to 1  |
+     +-------------------------------+-------------------------------+
+     | Masking-key (continued)       |          Payload Data         |
+     +-------------------------------- - - - - - - - - - - - - - - - +
+     :                     Payload Data continued ...                :
+     + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+     |                     Payload Data continued ...                |
+     +---------------------------------------------------------------+
 
+```
 ### 2.传输层相关协议
-tcp
+传输层实现了`upd`、`tcp`、灯协议，并实现了主要接口
 
-udp
+[tcp api](./tcp-api.md):`tcp-api.md`
 
-port端口机制
+```
+		     tcp 首部协议报文
+ 0                   1                   2                   3
+ 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Source Port          |       Destination Port        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                        Sequence Number                        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Acknowledgment Number                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Data |           |U|A|P|R|S|F|                               |
+| Offset| Reserved  |R|C|S|S|Y|I|            Window             |
+|       |           |G|K|H|T|N|N|                               |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|           Checksum            |         Urgent Pointer        |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Options                    |    Padding    |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                             data                              |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+```
+
+[udp-api](./udp-api.md):`./udp-api.md`
+```
+udp 协议报文
+```
+![](./resource/wm.png)
+
+端口机制
 

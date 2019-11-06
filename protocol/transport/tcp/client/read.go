@@ -3,7 +3,7 @@ import (
 	tcpip "github.com/brewlin/net-protocol/protocol"
 	"errors"
 )
-
+//Read 一次性读取完缓冲区数据
 func (c *Client) Read() ([]byte, error) {
 
 	var buf []byte

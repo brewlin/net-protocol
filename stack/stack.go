@@ -38,6 +38,7 @@ import (
 	"github.com/brewlin/net-protocol/pkg/waiter"
 )
 
+
 const (
 	// ageLimit is set to the same cache stale time used in Linux.
 	ageLimit = 1 * time.Minute
@@ -46,6 +47,8 @@ const (
 	// resolutionAttempts is set to the same ARP retries used in Linux.
 	resolutionAttempts = 3
 )
+
+var Pstack *Stack
 
 type transportProtocolState struct {
 	proto          TransportProtocol
@@ -338,6 +341,7 @@ func New(network []string, transport []string, opts Options) *Stack {
 		clock:              clock,
 		stats:              opts.Stats.FillIn(),
 	}
+	Pstack = s
 
 	// Add specified network protocols.
 	// 添加指定的网络层协议端，如IPV4

@@ -1,23 +1,14 @@
-package stack
+package stackinit
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net"
-	"os"
-	"strconv"
 	"strings"
-
-	"github.com/brewlin/net-protocol/pkg/logging"
 
 	"github.com/brewlin/net-protocol/protocol/link/fdbased"
 	"github.com/brewlin/net-protocol/protocol/link/tuntap"
 	"github.com/brewlin/net-protocol/protocol/transport/udp"
-
-	"github.com/brewlin/net-protocol/protocol/network/ipv6"
-
-	"github.com/brewlin/net-protocol/pkg/waiter"
 
 	"github.com/brewlin/net-protocol/protocol/network/arp"
 	"github.com/brewlin/net-protocol/protocol/network/ipv4"
@@ -30,35 +21,42 @@ import (
 var mac = flag.String("mac", "aa:00:01:01:01:01", "mac address to use in tap device")
 var tapName = "tap1"
 var cidrName = "192.168.1.0/24"
-var addrName = "192.168.1.1"
-var portName = "9999"
+
+//SetRoute 设置该路由信息
+func AddRoute(addr tcpip.Address) {
+	var proto = ipv4.ProtocolNumber
+
+	//在该协议栈上添加和注册相关的网络层协议
+	if err := stack.Pstack.AddAddress(1, proto, addr); err != nil {
+		log.Fatal(err)
+	}
+	//添加默认路由
+	// stack.Pstack.AddRouteTable(tcpip.Route{
+
+	// 	Destination: addr,
+	// 	Mask:        tcpip.AddressMask(addr),
+	// 	Gateway:     "",
+	// 	NIC:         1,
+	// })
+	stack.Pstack.AddRouteTable(tcpip.Route{
+
+		Destination: tcpip.Address(strings.Repeat("\x00", len(addr))),
+		Mask:        tcpip.AddressMask(strings.Repeat("\x00", len(addr))),
+		Gateway:     "",
+		NIC:         1,
+	})
+}
 func init() {
-	log.Printf("tap :%v addr :%v port :%v", tapName, addrName, portName)
+	//如果已经存在 p 指向的stack 则不需要在初始化
+	if stack.Pstack != nil {
+		return
+	}
+	log.Printf("tap :%v", tapName)
 
 	//解析mac地址
 	maddr, err := net.ParseMAC(*mac)
 	if err != nil {
 		log.Fatal(*mac)
-	}
-	parseAddr := net.ParseIP(addrName)
-	if err != nil {
-		log.Fatal("BAD ADDRESS", addrName)
-	}
-	//解析IP地址，ipv4,或者ipv6
-	var addr tcpip.Address
-	var proto tcpip.NetworkProtocolNumber
-	if parseAddr.To4() != nil {
-		addr = tcpip.Address(net.ParseIP(addrName).To4())
-		proto = ipv4.ProtocolNumber
-	} else if parseAddr.To16() != nil {
-		addr = tcpip.Address(net.ParseIP(addrName).To16())
-		proto = ipv6.ProtocolNumber
-	} else {
-		log.Fatal("unkonw iptype")
-	}
-	localPort, err := strconv.Atoi(portName)
-	if err != nil {
-		log.Fatalf("unable to convert port")
 	}
 
 	//虚拟网卡配置
@@ -91,24 +89,16 @@ func init() {
 	if err := s.CreateNamedNIC(1, "vnic1", linkID); err != nil {
 		log.Fatal(err)
 	}
-
-	//在该协议栈上添加和注册相关的网络层协议
-	if err := s.AddAddress(1, proto, addr); err != nil {
-		log.Fatal(err)
-	}
-
 	//在该协议栈上添加和注册arp协议
 	if err := s.AddAddress(1, arp.ProtocolNumber, arp.ProtocolAddress); err != nil {
 		log.Fatal(err)
 	}
-	//添加默认路由
-	s.SetRouteTable([]tcpip.Route{
-		{
-			Destination: tcpip.Address(strings.Repeat("\x00", len(addr))),
-			Mask:        tcpip.AddressMask(strings.Repeat("\x00", len(addr))),
-			Gateway:     "",
-			NIC:         1,
-		},
-	})
+	// stack.Pstack.AddRouteTable(tcpip.Route{
+
+	// 	Destination: tcpip.Address(strings.Repeat("\x00", len("0"))),
+	// 	Mask:        tcpip.AddressMask(strings.Repeat("\x00", len(addr))),
+	// 	Gateway:     "",
+	// 	NIC:         1,
+	// })
 
 }

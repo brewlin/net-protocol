@@ -29,15 +29,14 @@ import (
 	"sync"
 	"time"
 
-	"github.com/brewlin/net-protocol/pkg/sleep"
-	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/pkg/buffer"
+	"github.com/brewlin/net-protocol/pkg/seqnum"
+	"github.com/brewlin/net-protocol/pkg/sleep"
+	"github.com/brewlin/net-protocol/pkg/waiter"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/protocol/header"
 	"github.com/brewlin/net-protocol/protocol/ports"
-	"github.com/brewlin/net-protocol/pkg/seqnum"
-	"github.com/brewlin/net-protocol/pkg/waiter"
 )
-
 
 const (
 	// ageLimit is set to the same cache stale time used in Linux.
@@ -48,6 +47,7 @@ const (
 	resolutionAttempts = 3
 )
 
+//Pstack global stack
 var Pstack *Stack
 
 type transportProtocolState struct {
@@ -486,6 +486,13 @@ func (s *Stack) SetRouteTable(table []tcpip.Route) {
 	s.routeTable = table
 }
 
+// AddRouteTable add on remote route to table ,used to be tcp client
+func (s *Stack) AddRouteTable(r tcpip.Route) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.routeTable = append(s.routeTable, r)
+}
+
 // GetRouteTable returns the route table which is currently in use.
 func (s *Stack) GetRouteTable() []tcpip.Route {
 	s.mu.Lock()
@@ -729,7 +736,6 @@ func (s *Stack) GetMainNICAddress(id tcpip.NICID, protocol tcpip.NetworkProtocol
 func (s *Stack) FindRoute(id tcpip.NICID, localAddr, remoteAddr tcpip.Address, netProto tcpip.NetworkProtocolNumber) (Route, *tcpip.Error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
-
 	// 遍历路由表
 	for i := range s.routeTable {
 		if (id != 0 && id != s.routeTable[i].NIC) || (len(remoteAddr) != 0 && !s.routeTable[i].Match(remoteAddr)) {

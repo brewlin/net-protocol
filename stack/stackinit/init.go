@@ -21,15 +21,10 @@ import (
 var mac = flag.String("mac", "aa:00:01:01:01:01", "mac address to use in tap device")
 var tapName = "tap1"
 var cidrName = "192.168.1.0/24"
+var localAddres = tcpip.Address(net.ParseIP("192.168.1.1").To4())
 
 //SetRoute 设置该路由信息
 func AddRoute(addr tcpip.Address) {
-	var proto = ipv4.ProtocolNumber
-
-	//在该协议栈上添加和注册相关的网络层协议
-	if err := stack.Pstack.AddAddress(1, proto, addr); err != nil {
-		log.Fatal(err)
-	}
 	//添加默认路由
 	// stack.Pstack.AddRouteTable(tcpip.Route{
 
@@ -87,6 +82,11 @@ func init() {
 	s := stack.New([]string{ipv4.ProtocolName, arp.ProtocolName}, []string{tcp.ProtocolName, udp.ProtocolName}, stack.Options{})
 	//新建抽象网卡
 	if err := s.CreateNamedNIC(1, "vnic1", linkID); err != nil {
+		log.Fatal(err)
+	}
+	var proto = ipv4.ProtocolNumber
+	//在该协议栈上添加和注册相关的网络层协议 也就是注册本地地址
+	if err := stack.Pstack.AddAddress(1, proto, localAddres); err != nil {
 		log.Fatal(err)
 	}
 	//在该协议栈上添加和注册arp协议

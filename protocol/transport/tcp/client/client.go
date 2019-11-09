@@ -3,6 +3,7 @@ package client
 import (
 	"fmt"
 	"log"
+	"net"
 
 	"github.com/brewlin/net-protocol/pkg/waiter"
 
@@ -35,7 +36,8 @@ type Client struct {
 }
 
 //NewClient get new tcp client
-func NewClient(addr string, port int) *Client {
+func NewClient(addrName string, port int) *Client {
+	addr := tcpip.Address(net.ParseIP(addrName).To4())
 	return &Client{
 		addr: tcpip.Address(addr),
 		port: port,

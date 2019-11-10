@@ -1,11 +1,14 @@
 package client
+
 import (
-	tcpip "github.com/brewlin/net-protocol/protocol"
 	"errors"
+
+	tcpip "github.com/brewlin/net-protocol/protocol"
 )
+
 //Read 一次性读取完缓冲区数据
 func (c *Client) Read() ([]byte, error) {
-
+	<-c.notifyC
 	var buf []byte
 	var err error
 	for {

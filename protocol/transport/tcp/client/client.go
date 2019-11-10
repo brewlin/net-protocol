@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -50,15 +51,16 @@ func (c *Client) Set(s *stack.Stack) {
 }
 
 //Connect connect
-func (c *Client) Connect() {
+func (c *Client) Connect() error {
 	c.s = stack.Pstack
 	if c.s == nil {
-		log.Fatal("stack is nil")
+		log.Println("stack is nil")
+		return errors.New("stack is nil")
 	}
-	c.connect(c.s)
+	return c.connect(c.s)
 }
 
-func (c *Client) connect(s *stack.Stack) {
+func (c *Client) connect(s *stack.Stack) error {
 	//添加路由
 	stackinit.AddRoute(c.addr)
 	c.remote = tcpip.FullAddress{
@@ -69,13 +71,14 @@ func (c *Client) connect(s *stack.Stack) {
 	//新建一个tcp端
 	ep, err := s.NewEndpoint(tcp.ProtocolNumber, ipv4.ProtocolNumber, &wq)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
+		return err
 	}
 	c.ep = ep
 	c.queue = wq
 
 	c.waitEntry, c.notifyC = waiter.NewChannelEntry(nil)
-	wq.EventRegister(&c.waitEntry, waiter.EventOut)
+	wq.EventRegister(&c.waitEntry, waiter.EventOut|waiter.EventIn)
 	c.ep = ep
 	terr := c.ep.Connect(c.remote)
 	if terr == tcpip.ErrConnectStarted {
@@ -85,11 +88,13 @@ func (c *Client) connect(s *stack.Stack) {
 		terr = ep.GetSockOpt(tcpip.ErrorOption{})
 	}
 	if terr != nil {
-		log.Fatal("@传输层 tcp/client : Unable to connect: ", terr)
+		log.Println("@传输层 tcp/client : Unable to connect: ", terr)
 		fmt.Printf("@传输层 tcp/client : Unable to connect: ", terr)
+		return terr
 	}
 	log.Println("@传输层 tcp/client:Connected")
 	fmt.Println("@传输层 tcp/client:Connected")
+	return nil
 }
 func (c *Client) Close() {
 	c.queue.EventUnregister(&c.waitEntry)

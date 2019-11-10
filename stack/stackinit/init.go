@@ -86,7 +86,7 @@ func init() {
 	}
 	var proto = ipv4.ProtocolNumber
 	//在该协议栈上添加和注册相关的网络层协议 也就是注册本地地址
-	if err := stack.Pstack.AddAddress(1, proto, localAddres); err != nil {
+	if err := s.AddAddress(1, proto, localAddres); err != nil {
 		log.Fatal(err)
 	}
 	//在该协议栈上添加和注册arp协议

@@ -12,7 +12,7 @@ import (
 
 type Connection struct {
 	// 客户端连接的socket
-	socket tcpip.Endpoint
+	socket *Socket
 	// 状态码
 	status_code int
 	// 接收队列
@@ -40,7 +40,7 @@ type Connection struct {
 }
 
 //等待并接受新的连接
-func newCon(e tcpip.Endpoint, q *waiter.Queue) *Connection {
+func newCon(e *Socket) *Connection {
 	var con Connection
 	//创建结构实例
 	con.status_code = 0
@@ -51,12 +51,9 @@ func newCon(e tcpip.Endpoint, q *waiter.Queue) *Connection {
 	con.request = newRequest()
 	con.response = newResponse(&con)
 	con.recv_buf = ""
-	addr, _ := e.GetRemoteAddress()
 	log.Println("@application http: new client connection : ", addr)
-	con.addr = &addr
-	con.waitEntry, con.notifyC = waiter.NewChannelEntry(nil)
-	q.EventRegister(&con.waitEntry, waiter.EventIn)
-	con.q = q
+	con.addr = &s.addr
+	con.q = e.queue
 	return &con
 
 }
@@ -67,10 +64,10 @@ func newCon(e tcpip.Endpoint, q *waiter.Queue) *Connection {
 //发送响应
 //记录请求日志
 func (con *Connection) handler() {
-	<-con.notifyC
+	<-con.socket.notifyC
 	log.Println("@应用层 http: waiting new event trigger ...")
 	for {
-		v, _, err := con.socket.Read(con.addr)
+		v, _, err := con.socket.Read()
 		if err != nil {
 			if err == tcpip.ErrWouldBlock {
 				break
@@ -95,79 +92,3 @@ func (c *Connection) set_status_code(code int) {
 	}
 }
 
-//Write write
-func (c *Connection) Write(buf []byte) error {
-	v := buffer.View(buf)
-	c.socket.Write(tcpip.SlicePayload(v),
-		tcpip.WriteOptions{To: c.addr})
-	return nil
-}
-
-//Read data
-func (c *Connection) Read() ([]byte, error) {
-
-	var buf []byte
-	var err error
-	for {
-		v, _, e := c.socket.Read(c.addr)
-		if e != nil {
-			err = e
-			break
-		}
-		buf = append(buf, v...)
-	}
-	if buf == nil {
-		return nil, err
-	}
-	return buf, nil
-
-}
-
-//Readn  读取固定字节的数据
-func (c *Connection) Readn(p []byte) (int, error) {
-	c.bufmu.Lock()
-	defer c.bufmu.Unlock()
-	//获取足够长度的字节
-	if len(p) > len(c.buf) {
-
-		for {
-			if len(p) <= len(c.buf) {
-				break
-			}
-			buf, _, err := c.socket.Read(c.addr)
-			if err != nil {
-				if err == tcpip.ErrWouldBlock {
-					//阻塞等待数据
-					<-c.notifyC
-					continue
-				}
-				return 0, err
-			}
-			c.buf = append(c.buf, buf...)
-		}
-	}
-	if len(p) > len(c.buf) {
-		return 0, errors.New("package len is smaller than p need")
-	}
-
-	n := copy(p, c.buf)
-	c.buf = c.buf[len(p):]
-	return n, nil
-}
-
-//关闭连接
-func (c *Connection) Close() {
-	if c == nil {
-		return
-	}
-	//释放对应的请求
-	c.request = nil
-	c.response = nil
-	//放放客户端连接中的缓存
-	c.recv_buf = ""
-	//注销接受队列
-	c.q.EventUnregister(&c.waitEntry)
-	c.socket.Close()
-	//关闭socket连接
-	c = nil
-}

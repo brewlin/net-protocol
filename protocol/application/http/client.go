@@ -6,7 +6,7 @@ import (
 )
 
 type Client struct {
-	c *client.Client
+	c *Connection
 	path string
 }
 //NewCient new http client
@@ -16,7 +16,8 @@ func NewClient(url string)*Client{
 	if err != nil {
 		return err
 	}
-	c := client.NewClient(ip,port)
+	fd := client.NewClient(ip,port)
+	c := newCon(fd)
 	return &{
 		c:c,
 		path:path,

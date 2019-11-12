@@ -12,7 +12,7 @@ import (
 	"github.com/brewlin/net-protocol/protocol/transport/udp"
 
 	"github.com/brewlin/net-protocol/protocol/network/ipv6"
-
+	"github.com/brewlin/net-protocol/pkg/buffer"
 	"github.com/brewlin/net-protocol/pkg/waiter"
 
 	"github.com/brewlin/net-protocol/protocol/network/arp"
@@ -156,8 +156,10 @@ func (s *Server) ListenAndServ() {
 
 func (s *Server) dispatch(e tcpip.Endpoint, wq *waiter.Queue) {
 	log.Println("@application http: dispatch  got new request")
-	con := newCon(e, wq)
+	fd := NewServerSocket(e,wq)
+	con := newCon(fd)
 	con.handler()
 	log.Println("@application http: dispatch  close this request")
 	con.Close()
 }
+

@@ -7,6 +7,7 @@ import (
 
 type Client struct {
 	c *Connection
+	client *client.Client
 	path string
 }
 //NewCient new http client
@@ -20,10 +21,12 @@ func NewClient(url string)*Client{
 	c := newCon(fd)
 	return &{
 		c:c,
+		client:fd,
 		path:path,
 
 	}
 }
 func (c *Client)Get(buf string){
-	
+	c.c.recv_buf = c.client.Read()
+	c.c.parse(c.c)
 }

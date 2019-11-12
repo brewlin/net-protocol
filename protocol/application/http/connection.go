@@ -1,7 +1,6 @@
 package http
 
 import (
-	"errors"
 	"log"
 	"sync"
 
@@ -91,4 +90,3 @@ func (c *Connection) set_status_code(code int) {
 		c.status_code = code
 	}
 }
-

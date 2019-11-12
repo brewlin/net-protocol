@@ -1,39 +1,26 @@
 package http
 
 import (
-	"flag"
-	"log"
-	"net"
-	"strconv"
-	"strings"
+	"errors"
 
-	"github.com/brewlin/net-protocol/protocol/link/fdbased"
-	"github.com/brewlin/net-protocol/protocol/link/tuntap"
-	"github.com/brewlin/net-protocol/protocol/transport/udp"
-
-	"github.com/brewlin/net-protocol/protocol/network/ipv6"
 	"github.com/brewlin/net-protocol/pkg/buffer"
 	"github.com/brewlin/net-protocol/pkg/waiter"
-
-	"github.com/brewlin/net-protocol/protocol/network/arp"
-	"github.com/brewlin/net-protocol/protocol/network/ipv4"
-	"github.com/brewlin/net-protocol/protocol/transport/tcp"
-	"github.com/brewlin/net-protocol/stack"
 
 	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
 type ServerSocket struct {
-	e tcpip.Endpoint
+	e    tcpip.Endpoint
 	addr tcpip.FullAddress
 
 	waitEntry waiter.Entry
 	notifyC   chan struct{}
-	queue *waiter.Queue
+	queue     *waiter.Queue
 }
-func NewServerSocket(e tcpip.Endpoint, q *waiter.Queue)*ServerSocket{
+
+func NewServerSocket(e tcpip.Endpoint, q *waiter.Queue) *ServerSocket {
 	s := &ServerSocket{
-		e:e,
+		e: e,
 	}
 	s.waitEntry, s.notifyC = waiter.NewChannelEntry(nil)
 	q.EventRegister(&con.waitEntry, waiter.EventIn)
@@ -41,6 +28,7 @@ func NewServerSocket(e tcpip.Endpoint, q *waiter.Queue)*ServerSocket{
 	s.queue = q
 	return s
 }
+
 //Write write
 func (s *ServerSocket) Write(buf []byte) error {
 	v := buffer.View(buf)
@@ -48,6 +36,7 @@ func (s *ServerSocket) Write(buf []byte) error {
 		tcpip.WriteOptions{To: s.addr})
 	return nil
 }
+
 //Read data
 func (s *ServerSocket) Read() ([]byte, error) {
 	var buf []byte

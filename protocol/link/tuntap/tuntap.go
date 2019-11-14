@@ -45,6 +45,17 @@ func NewNetDev(c *Config) (fd int, err error) {
 	return
 }
 
+//CreateTap 通过命令行 ip 创建网卡
+func CreateTap(name string) (err error) {
+	//ip tuntap add mode tap tap0
+	out, cmdErr := exec.Command("ip", "tuntap", "add", "mode", "tap", name).CombinedOutput()
+	if cmdErr != nil {
+		err = fmt.Errorf("%v:%v", cmdErr, string(out))
+		return
+	}
+	return
+}
+
 //SetLinkUp 让系统启动该网卡
 func SetLinkUp(name string) (err error) {
 	//ip link set <device_name> up
@@ -71,6 +82,27 @@ func SetRoute(name, cidr string) (err error) {
 func AddIP(name, ip string) (err error) {
 	//ip addr add 192.168.1.1 dev tap0
 	out, cmdErr := exec.Command("ip", "addr", "add", ip, "dev", name).CombinedOutput()
+	if cmdErr != nil {
+		err = fmt.Errorf("%v:%v", cmdErr, string(out))
+		return
+	}
+	return
+}
+
+//AddGateWay 通过ip命令 添加网关
+func AddGateWay(dst, gateway, name string) (err error) {
+	//ip route add default via gateway dev tap
+	out, cmdErr := exec.Command("ip", "route", "add", dst, "via", gateway, "dev", name).CombinedOutput()
+	if cmdErr != nil {
+		err = fmt.Errorf("%v:%v", cmdErr, string(out))
+		return
+	}
+	return
+}
+
+//DelTap 删除网卡
+func DelTap(name string) (err error) {
+	out, cmdErr := exec.Command("ip", "tuntap", "del", "mode", "tap", name).CombinedOutput()
 	if cmdErr != nil {
 		err = fmt.Errorf("%v:%v", cmdErr, string(out))
 		return

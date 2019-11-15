@@ -23,11 +23,11 @@ func main() {
 		fmt.Println(err)
 		return
 	}
-	//增加ip地址
-	if err := tuntap.AddIP(name, ipname); err != nil {
-		fmt.Println(err)
-		return
-	}
+	// //增加ip地址
+	// if err := tuntap.AddIP(name, ipname); err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
 	//添加路由
 	if err := tuntap.SetRoute(name, cidrname); err != nil {
 		fmt.Println(err)

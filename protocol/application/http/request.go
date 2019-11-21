@@ -18,6 +18,8 @@ type Request struct {
 	uri            string
 	headers        *http_headers
 	content_length int
+	//数据包 body
+	body string
 }
 
 //初始化一个httprequest
@@ -115,7 +117,8 @@ func (req *Request) parse(con *Connection) {
 		}
 		req.headers.http_headers_add(key, value)
 	}
-
+	//剩下到就是 body
+	con.body = p
 	con.status_code = 200
 }
 
@@ -130,4 +133,8 @@ func (req *Request) GetHeader(h string) string {
 		return ""
 	}
 	return req.headers.ptr[h]
+}
+//GetBody get get|post data
+func (req *Request) GetBody()string{
+	return req.body
 }

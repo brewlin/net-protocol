@@ -6,7 +6,7 @@ import (
 )
 
 type Client struct {
-	c *Connection
+	con *Connection
 	client *client.Client
 	path string
 }
@@ -19,14 +19,27 @@ func NewClient(url string)*Client{
 	}
 	fd := client.NewClient(ip,port)
 	c := newCon(fd)
-	return &{
-		c:c,
+	return &Client{
+		con:c,
 		client:fd,
 		path:path,
 
 	}
 }
+
+//Get get data
 func (c *Client)Get(buf string){
-	c.c.recv_buf = c.client.Read()
-	c.c.parse(c.c)
+	c.con.recv_buf = c.client.Read()
+	c.con.request.parse(c.con)
+	return c.con.request.GetBody()
+}
+//Post get data
+func (c *Client)Post(buf string){
+	c.con.recv_buf = c.client.Read()
+	c.con.request.parse(c.con)
+	return c.con.request.GetBody()
+}
+//GetRequest
+func (c *Client)GetRequest()*Request{
+	return c.con.request
 }

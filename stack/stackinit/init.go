@@ -1,7 +1,7 @@
 package stackinit
 
 import (
-	"flag"
+	"github.com/brewlin/net-protocol/config"
 	"log"
 	"net"
 	"strings"
@@ -18,11 +18,6 @@ import (
 	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
-var mac = flag.String("mac", "aa:00:01:01:01:01", "mac address to use in tap device")
-var tapName = "tap1"
-var cidrName = "192.168.1.0/24"
-var localAddres = tcpip.Address(net.ParseIP("192.168.1.1").To4())
-
 //SetRoute 设置该路由信息
 func AddRoute(addr tcpip.Address) {
 	//添加默认路由
@@ -37,6 +32,7 @@ func AddRoute(addr tcpip.Address) {
 
 		Destination: tcpip.Address(strings.Repeat("\x00", len(addr))),
 		Mask:        tcpip.AddressMask(strings.Repeat("\x00", len(addr))),
+		//Gateway:     tcpip.Address(net.ParseIP("10.0.2.2").To4()),
 		Gateway:     "",
 		NIC:         1,
 	})
@@ -46,17 +42,17 @@ func init() {
 	if stack.Pstack != nil {
 		return
 	}
-	log.Printf("tap :%v", tapName)
+	log.Printf("tap :%v", config.NicName)
 
 	//解析mac地址
-	maddr, err := net.ParseMAC(*mac)
+	maddr, err := net.ParseMAC(*config.Mac)
 	if err != nil {
-		log.Fatal(*mac)
+		log.Fatal(*config.Mac)
 	}
 
 	//虚拟网卡配置
 	conf := &tuntap.Config{
-		Name: tapName,
+		Name: config.NicName,
 		Mode: tuntap.TAP,
 	}
 
@@ -66,10 +62,16 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//启动网卡
-	tuntap.SetLinkUp(tapName)
-	//设置路由
-	tuntap.SetRoute(tapName, cidrName)
+	////启动网卡
+	//if err := tuntap.SetLinkUp(config.NicName);err != nil {
+	//	panic(err)
+	//	return
+	//}
+	////设置路由
+	//if err := tuntap.SetRoute(config.NicName, config.Cidrname); err != nil {
+	//	panic(err)
+	//	return
+	//}
 
 	//抽象网卡层接口
 	linkID := fdbased.New(&fdbased.Options{
@@ -86,7 +88,7 @@ func init() {
 	}
 	var proto = ipv4.ProtocolNumber
 	//在该协议栈上添加和注册相关的网络层协议 也就是注册本地地址
-	if err := s.AddAddress(1, proto, localAddres); err != nil {
+	if err := s.AddAddress(1, proto, config.LocalAddres); err != nil {
 		log.Fatal(err)
 	}
 	//在该协议栈上添加和注册arp协议

@@ -2,24 +2,19 @@ package main
 
 import (
 	"fmt"
+	"github.com/brewlin/net-protocol/config"
 
 	"github.com/brewlin/net-protocol/protocol/link/tuntap"
 )
 
-var name = "tap"
-var cidrname = "192.168.1.0/24"
-var ipname = "192.168.1.1/24"
-var destinationNet = "default"
-var gatewayNet = "192.168.1.2"
-
 func main() {
 	//创建网卡
-	if err := tuntap.CreateTap(name); err != nil {
+	if err := tuntap.CreateTap(config.NicName); err != nil {
 		fmt.Println(err)
 		return
 	}
 	//启动网卡
-	if err := tuntap.SetLinkUp(name); err != nil {
+	if err := tuntap.SetLinkUp(config.NicName); err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -29,12 +24,12 @@ func main() {
 	// 	return
 	// }
 	//添加路由
-	if err := tuntap.SetRoute(name, cidrname); err != nil {
+	if err := tuntap.SetRoute(config.NicName, config.Cidrname); err != nil {
 		fmt.Println(err)
 		return
 	}
 	//添加网关
-	if err := tuntap.AddGateWay(destinationNet, gatewayNet, name); err != nil {
+	if err := tuntap.AddGateWay(config.DestinationNet, config.GatewayNet, config.NicName); err != nil {
 		fmt.Println(err)
 		return
 	}

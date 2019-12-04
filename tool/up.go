@@ -19,18 +19,18 @@ func main() {
 		return
 	}
 	// //增加ip地址
-	// if err := tuntap.AddIP(name, ipname); err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
+	//if err := tuntap.AddIP(config.NicName, config.Ipname); err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
 	//添加路由
 	if err := tuntap.SetRoute(config.NicName, config.Cidrname); err != nil {
 		fmt.Println(err)
 		return
 	}
-	//添加网关
-	if err := tuntap.AddGateWay(config.DestinationNet, config.GatewayNet, config.NicName); err != nil {
-		fmt.Println(err)
-		return
-	}
+	////添加网关
+	//if err := tuntap.AddGateWay(config.DestinationNet, config.GatewayNet, config.NicName); err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
 }

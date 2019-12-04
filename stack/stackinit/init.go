@@ -20,20 +20,16 @@ import (
 
 //SetRoute 设置该路由信息
 func AddRoute(addr tcpip.Address) {
+	//未配置， 则自动随机获取网卡ipv4地址
+	if config.HardwardIp == "" {
+		config.HardwardIp = ipv4.InternalIP()
+	}
 	//添加默认路由
-	// stack.Pstack.AddRouteTable(tcpip.Route{
-
-	// 	Destination: addr,
-	// 	Mask:        tcpip.AddressMask(addr),
-	// 	Gateway:     "",
-	// 	NIC:         1,
-	// })
 	stack.Pstack.AddRouteTable(tcpip.Route{
 
 		Destination: tcpip.Address(strings.Repeat("\x00", len(addr))),
 		Mask:        tcpip.AddressMask(strings.Repeat("\x00", len(addr))),
-		//Gateway:     tcpip.Address(net.ParseIP("10.0.2.2").To4()),
-		Gateway:     "",
+		Gateway:     tcpip.Address(net.ParseIP(config.HardwardIp).To4()),
 		NIC:         1,
 	})
 }
@@ -55,24 +51,12 @@ func init() {
 		Name: config.NicName,
 		Mode: tuntap.TAP,
 	}
-
 	var fd int
 	//新建虚拟网卡
 	fd, err = tuntap.NewNetDev(conf)
 	if err != nil {
 		log.Fatal(err)
 	}
-	////启动网卡
-	//if err := tuntap.SetLinkUp(config.NicName);err != nil {
-	//	panic(err)
-	//	return
-	//}
-	////设置路由
-	//if err := tuntap.SetRoute(config.NicName, config.Cidrname); err != nil {
-	//	panic(err)
-	//	return
-	//}
-
 	//抽象网卡层接口
 	linkID := fdbased.New(&fdbased.Options{
 		FD:                 fd,
@@ -95,12 +79,4 @@ func init() {
 	if err := s.AddAddress(1, arp.ProtocolNumber, arp.ProtocolAddress); err != nil {
 		log.Fatal(err)
 	}
-	// stack.Pstack.AddRouteTable(tcpip.Route{
-
-	// 	Destination: tcpip.Address(strings.Repeat("\x00", len("0"))),
-	// 	Mask:        tcpip.AddressMask(strings.Repeat("\x00", len(addr))),
-	// 	Gateway:     "",
-	// 	NIC:         1,
-	// })
-
 }

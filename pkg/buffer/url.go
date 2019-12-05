@@ -1,10 +1,10 @@
 package buffer
 
-import(
+import (
+	"errors"
+	"log"
 	"regexp"
 	"strconv"
-	"errors"
-	"fmt"
 )
 //ResolveUrl parse url to ip port path
 //http://10.0.2.15/test
@@ -19,7 +19,7 @@ func ParseUrl(url string)(ip string,port int,path string,err error){
 	urlPar := regex[0]
 	var oport string
 	ip,oport,path = urlPar[1],urlPar[3],urlPar[4]
-	fmt.Println(urlPar)
+	log.Println(urlPar)
 	if oport == "" {
 		oport = "80"
 	}

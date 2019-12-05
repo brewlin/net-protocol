@@ -1,7 +1,8 @@
 package client
+
 import (
-	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/pkg/buffer"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 //Write
 func (c *Client) Write(buf []byte) error {

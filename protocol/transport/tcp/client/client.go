@@ -2,7 +2,6 @@ package client
 
 import (
 	"errors"
-	"fmt"
 	"log"
 	"net"
 
@@ -35,6 +34,7 @@ type Client struct {
 	remote tcpip.FullAddress
 	queue  waiter.Queue
 }
+
 
 //NewClient get new tcp client
 func NewClient(addrName string, port int) *Client {
@@ -83,17 +83,14 @@ func (c *Client) connect(s *stack.Stack) error {
 	terr := c.ep.Connect(c.remote)
 	if terr == tcpip.ErrConnectStarted {
 		log.Println("@传输层 tcp/client : Connect is pending...")
-		fmt.Println("@传输层 tcp/client : Connect is pending...")
 		<-c.notifyC
 		terr = ep.GetSockOpt(tcpip.ErrorOption{})
 	}
 	if terr != nil {
 		log.Println("@传输层 tcp/client : Unable to connect: ", terr)
-		fmt.Printf("@传输层 tcp/client : Unable to connect: ", terr)
 		return terr
 	}
 	log.Println("@传输层 tcp/client:Connected")
-	fmt.Println("@传输层 tcp/client:Connected")
 	return nil
 }
 func (c *Client) Close() {
@@ -101,3 +98,4 @@ func (c *Client) Close() {
 	c.ep.Close()
 	log.Println("@传输层 tcp/client :tcp disconnected")
 }
+

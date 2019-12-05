@@ -1,6 +1,7 @@
 package http
 
 import (
+	"github.com/brewlin/net-protocol/internal/socket"
 	"log"
 	"sync"
 
@@ -11,7 +12,7 @@ import (
 
 type Connection struct {
 	// 客户端连接的socket
-	socket *Socket
+	socket socket.Socket
 	// 状态码
 	status_code int
 	// 接收队列
@@ -39,10 +40,10 @@ type Connection struct {
 }
 
 //等待并接受新的连接
-func newCon(e *Socket) *Connection {
+func newCon(e socket.Socket) *Connection {
 	var con Connection
 	//创建结构实例
-	con.status_code = 0
+	con.status_code = 200
 	con.request_len = 0
 	con.socket = e
 	con.real_path = ""
@@ -50,9 +51,9 @@ func newCon(e *Socket) *Connection {
 	con.request = newRequest()
 	con.response = newResponse(&con)
 	con.recv_buf = ""
-	log.Println("@application http: new client connection : ", addr)
-	con.addr = &s.addr
-	con.q = e.queue
+	log.Println("@application http: new client connection : ", *e.GetRemoteAddr())
+	con.addr = e.GetRemoteAddr()
+	con.q = e.GetQueue()
 	return &con
 
 }
@@ -63,10 +64,10 @@ func newCon(e *Socket) *Connection {
 //发送响应
 //记录请求日志
 func (con *Connection) handler() {
-	<-con.socket.notifyC
+	<-con.socket.GetNotify()
 	log.Println("@应用层 http: waiting new event trigger ...")
 	for {
-		v, _, err := con.socket.Read()
+		v, err := con.socket.Read()
 		if err != nil {
 			if err == tcpip.ErrWouldBlock {
 				break

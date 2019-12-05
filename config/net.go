@@ -14,6 +14,6 @@ var Cidrname = "192.168.1.0/24"
 //localip
 var LocalAddres = tcpip.Address(net.ParseIP("192.168.1.1").To4())
 //物理网卡ip 作为连通外网的网关使用,不填默认自动获取
-var HardwardIp = ""
+var HardwardIp = "10.0.2.15"
 //物理网卡名
 var HardwardName = "enp0s3"

@@ -16,6 +16,7 @@ type Request struct {
 	//原始版本
 	version_raw    string
 	uri            string
+	port 			int
 	headers        *http_headers
 	content_length int
 	//数据包 body
@@ -53,7 +54,6 @@ func (req *Request) parse(con *Connection) {
 		con.set_status_code(501)
 	} else if req.method == HTTP_METHOD_UNKNOWN {
 		con.status_code = 400
-		return
 	}
 
 	// 获得URI
@@ -62,7 +62,6 @@ func (req *Request) parse(con *Connection) {
 
 	if req.uri == "" {
 		con.status_code = 400
-		return
 	}
 
 	/*
@@ -99,27 +98,28 @@ func (req *Request) parse(con *Connection) {
 	}
 	log.Println("@application http: header parse version:", req.version)
 	log.Println("@application http: header parse status_code:", con.status_code)
-	if con.status_code > 0 {
-		return
-	}
+	//if con.status_code > 0 {
+	//	return
+	//}
 
 	// 解析HTTP请求头部
 
 	p := buf
-
-	key, value := "", ""
+	key, value,tmp := "", "",""
 	for p != "" {
-		key, p = match_until(p, ": ")
-		value, p = match_until(p, "\r\n")
-
+		if key, tmp = match_until(p, ": ");key != "" {
+			p = tmp
+		}
+		if value, tmp = match_until(p, "\r\n");value != "" {
+			p = tmp
+		}
 		if key == "" || value == "" {
-			continue
+			break
 		}
 		req.headers.http_headers_add(key, value)
 	}
 	//剩下到就是 body
-	con.body = p
-	con.status_code = 200
+	req.body = p
 }
 
 //GetMethod d

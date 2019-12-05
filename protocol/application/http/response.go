@@ -3,9 +3,6 @@ package http
 import (
 	"log"
 	"strconv"
-
-	"github.com/brewlin/net-protocol/pkg/buffer"
-	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
 // HTTP响应结构体，包含内容长度，内容，HTTP头部
@@ -143,8 +140,7 @@ func (r *Response) build_and_send_response() {
  * 将响应消息发送给客户端
  */
 func (r *Response) send_all(buf string) {
-	v := buffer.View(buf)
-	r.con.socket.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: r.con.addr})
+	r.con.socket.Write([]byte(buf))
 }
 
 //Error set status_code

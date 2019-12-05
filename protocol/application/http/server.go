@@ -1,7 +1,7 @@
 package http
 
 import (
-	"flag"
+	"github.com/brewlin/net-protocol/config"
 	"log"
 	"net"
 	"strconv"
@@ -22,7 +22,6 @@ import (
 	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 
-var mac = flag.String("mac", "aa:00:01:01:01:01", "mac address to use in tap device")
 
 //Server Http
 type Server struct {
@@ -37,14 +36,11 @@ func NewHTTP(tapName, cidrName, addrName, portName string) *Server {
 	var server Server
 	log.Printf("@application listen:tap :%v addr :%v port :%v", tapName, addrName, portName)
 	//解析mac地址
-	maddr, err := net.ParseMAC(*mac)
+	maddr, err := net.ParseMAC(*config.Mac)
 	if err != nil {
-		log.Fatal(*mac)
+		log.Fatal(*config.Mac)
 	}
 	parseAddr := net.ParseIP(addrName)
-	if err != nil {
-		log.Fatal("@application http:BAD ADDRESS", addrName)
-	}
 	//解析IP地址，ipv4,或者ipv6
 	var addr tcpip.Address
 	var proto tcpip.NetworkProtocolNumber
@@ -159,5 +155,5 @@ func (s *Server) dispatch(e tcpip.Endpoint, wq *waiter.Queue) {
 	con := newCon(fd)
 	con.handler()
 	log.Println("@application http: dispatch  close this request")
-	con.Close()
+	con.socket.Close()
 }

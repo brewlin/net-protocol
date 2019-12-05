@@ -1,10 +1,14 @@
 # tool
-
+## 注意
+工具默认会更改本地物理网卡的防火墙入站出站规则，以及数据包转发机制
+## 配置
+```
+> make
+```
 ## @虚拟网卡管理
 启动网卡
 ```
-> go build netup.go
-> sudo ./netup
+> sudo ./up
 
 > ifconfig
 tap       Link encap:Ethernet  HWaddr 3e:80:55:c6:48:10  
@@ -18,7 +22,6 @@ tap       Link encap:Ethernet  HWaddr 3e:80:55:c6:48:10
 
 关闭网卡
 ```
-> go build netdown.go
-> sudo ./netdown
+> sudo ./down
 
 ```

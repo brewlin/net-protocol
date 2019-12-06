@@ -152,7 +152,7 @@ func (s *Server) ListenAndServ() {
 func (s *Server) dispatch(e tcpip.Endpoint, wq *waiter.Queue) {
 	log.Println("@application http: dispatch  got new request")
 	fd := NewServerSocket(e, wq)
-	con := newCon(fd)
+	con := NewCon(fd)
 	con.handler()
 	log.Println("@application http: dispatch  close this request")
 	con.socket.Close()

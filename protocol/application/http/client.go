@@ -21,7 +21,7 @@ func NewClient(url string)(*Client,error){
 	if err := fd.Connect(); err != nil {
 		return nil,err
 	}
-	c := newCon(fd)
+	c := NewCon(fd)
 	req := newRequest()
 	req.init(path,ip,port)
 	return &Client{
@@ -34,12 +34,25 @@ func NewClient(url string)(*Client,error){
 func (c *Client)SetMethod(method string) {
 	c.req.method_raw = method
 }
+//SetHeaders
+func (c *Client)SetHeaders(headers map[string]string){
+	for k,v := range headers {
+		c.req.headers.ptr[k] = v
+	}
+}
 //SetData
 func (c *Client)SetData(buf string) {
 	c.req.body = buf
 }
+//GetResult
+func (c *Client)GetResult()(string,error)  {
+	if err := c.Push();err != nil {
+		return "",err
+	}
+	return c.con.request.GetBody(),nil
+}
 //GetBody
-func (c *Client)GetBody()(body string,err error) {
+func (c *Client)Push()(err error) {
 	buf := c.req.send()
 	if err = c.client.Write([]byte(buf)); err != nil {
 		return
@@ -47,9 +60,11 @@ func (c *Client)GetBody()(body string,err error) {
 	recvbuf,_ := c.client.Read()
 	c.con.recv_buf = string(recvbuf)
 	c.con.request.parse(c.con)
-	body = c.con.request.GetBody()
-	c.client.Close()
 	return
+}
+//GetConnection
+func (c *Client)GetConnection()*Connection{
+	return c.con
 }
 func (c *Client)GetRequest()*Request{
 	return c.con.request

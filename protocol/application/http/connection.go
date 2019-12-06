@@ -40,7 +40,7 @@ type Connection struct {
 }
 
 //等待并接受新的连接
-func newCon(e socket.Socket) *Connection {
+func NewCon(e socket.Socket) *Connection {
 	var con Connection
 	//创建结构实例
 	con.status_code = 200
@@ -57,7 +57,22 @@ func newCon(e socket.Socket) *Connection {
 	return &con
 
 }
-
+//Close close the connection
+func (con *Connection)Close()  {
+	con.socket.Close()
+}
+//Write
+func (con *Connection)Write(buf []byte)error{
+	return con.socket.Write(buf)
+}
+//Read 读取单次所有数据包 不等待直接返回
+func (con *Connection)Read()([]byte,error){
+	return con.socket.Read()
+}
+//Readn 读取n字节
+func (con *Connection)Readn(p []byte)(int,error){
+	return con.socket.Readn(p)
+}
 //HTTP 请求处理主函数
 //从socket中读取数据并解析http请求
 //解析请求

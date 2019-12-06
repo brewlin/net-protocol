@@ -18,7 +18,7 @@ func main(){
 	}
 	cli.SetMethod("GET")
 	cli.SetData("test")
-	res,err := cli.GetBody()
+	res,err := cli.GetResult()
 	fmt.Println(res)
 
 }

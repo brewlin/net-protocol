@@ -52,7 +52,7 @@ func (c *Conn) Close() {
 }
 
 //发送数据
-func (c *Conn) SendData(data []byte) {
+func (c *Conn) SendData(data []byte)error {
 	length := len(data)
 	c.writeBuf = make([]byte, 10+length)
 
@@ -90,7 +90,7 @@ func (c *Conn) SendData(data []byte) {
 	log.Printf("2 bit:%b\n", c.writeBuf[1])
 
 	copy(c.writeBuf[payloadStart:], data[:])
-	c.conn.Write(c.writeBuf[:payloadStart+length])
+	return c.conn.Write(c.writeBuf[:payloadStart+length])
 }
 
 //读取数据

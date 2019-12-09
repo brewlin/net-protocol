@@ -15,6 +15,9 @@ func (r *Request)init(path,ip string,port int)  {
 	}
 }
 func (r *Request) send()string{
+	if r.method_raw == "" {
+		r.method_raw = "GET"
+	}
 	// 构建发送的字符串
 	buf := ""
 	buf += r.method_raw + " "

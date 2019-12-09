@@ -79,21 +79,10 @@ func (con *Connection)Readn(p []byte)(int,error){
 //发送响应
 //记录请求日志
 func (con *Connection) handler() {
-	<-con.socket.GetNotify()
 	log.Println("@应用层 http: waiting new event trigger ...")
-	for {
-		v, err := con.socket.Read()
-		if err != nil {
-			if err == tcpip.ErrWouldBlock {
-				break
-			}
-			log.Println("@应用层 http:tcp read  got error", err)
-			break
-		}
-		con.recv_buf += string(v)
-	}
-	log.Println("http协议原始数据:")
-	log.Println(con.recv_buf)
+	v,_ := con.socket.Read()
+	con.recv_buf = string(v)
+	log.Println("http协议原始数据:",con.recv_buf)
 	con.request.parse(con)
 	//dispatch the route request
 	defaultMux.dispatch(con)

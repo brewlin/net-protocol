@@ -57,6 +57,12 @@ func NewHTTP(tapName, cidrName, addrName, portName string) *Server {
 	if err != nil {
 		log.Fatalf("unable to convert port")
 	}
+	if stack.Pstack != nil {
+		server.s = stack.Pstack
+		server.port = localPort
+		server.addr = addr
+		return &server
+	}
 
 	//虚拟网卡配置
 	conf := &tuntap.Config{

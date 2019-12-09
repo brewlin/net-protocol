@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/brewlin/net-protocol/config"
 	"log"
 
 	"github.com/brewlin/net-protocol/pkg/logging"
@@ -13,7 +14,7 @@ func init() {
 	logging.Setup()
 }
 func main() {
-	serv := http.NewHTTP("tap1", "192.168.1.0/24", "192.168.1.1", "9502")
+	serv := http.NewHTTP(config.NicName, "192.168.1.0/24", "192.168.1.1", "9502")
 	serv.HandleFunc("/ws", echo)
 
 	serv.HandleFunc("/", func(request *http.Request, response *http.Response) {

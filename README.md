@@ -15,13 +15,10 @@
 `./cmd/*.md`
 ## @application 应用层
 - [x] http [docs](./cmd/http.md)
-    - [x] http client
 - [x] websocket [docs](./cmd/websocket.md)
-    - [ ] websocket client
 
 ## @transport 传输层
 - [x] tcp [docs](./cmd/tcp.md)
-    - [x] tcp client
 - [x] udp [docs](./cmd/udp.md)
 - [x] port 端口机制
 
@@ -37,6 +34,11 @@
 ## @物理层
 - [x] tun tap 虚拟网卡的实现
 
+## @客户端
+发起客户端请求
+- [x] http client 
+- [x] websocket client 
+- [x] tcp client
 ## 协议相关api
 ### 1.应用层相关协议
 应用层暂时只实现了`http`、`websocket`等文本协议。都基于tcp、对tcp等进行二次封装

@@ -44,9 +44,6 @@ func main() {
 		log.Fatalf("Bad mac address:%v", *mac)
 	}
 	parseAddr := net.ParseIP(addrName)
-	if err != nil {
-		log.Fatalf("bad address:%v", addrName)
-	}
 
 	//解析ip地址，ipv4 或者ipv6
 	var addr tcpip.Address
@@ -65,7 +62,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to convert port %v:%v", portName, err)
 	}
-
+	if stack.Pstack != nil {
+		echo(stack.Pstack,proto,addr,localPort)
+		return
+	}
 	//虚拟网卡配置
 	conf := &tuntap.Config{
 		Name: tapName,
@@ -118,20 +118,20 @@ func main() {
 		},
 	})
 
+	echo(s,proto,addr,localPort)
+
+}
+func echo(s *stack.Stack,proto tcpip.NetworkProtocolNumber,addr tcpip.Address,localPort int) {
 	var wq waiter.Queue
 	//新建一个UDP端
-	ep, e := s.NewEndpoint(udp.ProtocolNumber, proto, &wq)
+	ep, err := s.NewEndpoint(udp.ProtocolNumber, proto, &wq)
 	if err != nil {
-		log.Fatal(e)
+		log.Fatal(err)
 	}
 	//绑定本地端口
 	if err := ep.Bind(tcpip.FullAddress{1, addr, uint16(localPort)}, nil); err != nil {
 		log.Fatal("@main : bind failed :", err)
 	}
-	echo(&wq, ep)
-
-}
-func echo(wq *waiter.Queue, ep tcpip.Endpoint) {
 	defer ep.Close()
 	//创建队列 通知 channel
 	waitEntry, notifych := waiter.NewChannelEntry(nil)

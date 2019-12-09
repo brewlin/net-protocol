@@ -50,9 +50,7 @@ func main() {
 		log.Fatal(*mac)
 	}
 	parseAddr := net.ParseIP(addrName)
-	if err != nil {
-		log.Fatal("BAD ADDRESS", addrName)
-	}
+
 	//解析IP地址，ipv4,或者ipv6
 	var addr tcpip.Address
 	var proto tcpip.NetworkProtocolNumber
@@ -69,7 +67,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("unable to convert port")
 	}
-
+	if stack.Pstack != nil {
+		tcpServer(stack.Pstack, addr, localPort)
+		return
+	}
 	//虚拟网卡配置
 	conf := &tuntap.Config{
 		Name: tapName,

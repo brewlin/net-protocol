@@ -17,3 +17,5 @@ var LocalAddres = tcpip.Address(net.ParseIP("192.168.1.1").To4())
 var HardwardIp = "10.0.2.15"
 //物理网卡名
 var HardwardName = "enp0s3"
+
+var LocalPort uint16 = 9000

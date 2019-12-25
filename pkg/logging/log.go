@@ -16,3 +16,6 @@ func Setup() {
 	log.SetFlags(log.Lshortfile)
 	return
 }
+func init(){
+	Setup()
+}

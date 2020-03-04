@@ -45,6 +45,13 @@ func (v *View) CapLength(length int) {
 	*v = (*v)[:length:length]
 }
 
+//NextBytes get next bytes
+func (v *View) NextBytes(size int) []byte {
+	defer v.TrimFront(size)
+
+	return (*v)[:size]
+}
+
 // ToVectorisedView returns a VectorisedView containing the receiver.
 func (v View) ToVectorisedView() VectorisedView {
 	return NewVectorisedView(len(v), []View{v})

@@ -118,6 +118,7 @@ func (e *endpoint) HandlePacket(r *stack.Route, vv buffer.VectorisedView) {
 		// 当收到 arp 请求需要添加到链路地址缓存中
 		fallthrough // also fill the cache from requests
 	case header.ARPReply:
+		log.Println("@网络层 arp: step2 : 解析arp回复")
 		// 这里记录ip和mac对应关系，也就是arp表
 		addr := tcpip.Address(h.ProtocolAddressSender())
 		linkAddr := tcpip.LinkAddress(h.HardwareAddressSender())

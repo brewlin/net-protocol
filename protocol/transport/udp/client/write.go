@@ -7,7 +7,13 @@ import (
 //Write
 func (c *Client) Write(buf []byte) error {
 	v := buffer.View(buf)
-	c.ep.Write(tcpip.SlicePayload(v),
-		tcpip.WriteOptions{To: &c.remote})
-	return nil
+	for{
+		_,ch,err := c.ep.Write(tcpip.SlicePayload(v),
+			tcpip.WriteOptions{To: &c.remote})
+		if err == tcpip.ErrNoLinkAddress {
+			<-ch
+			continue
+		}
+		return err
+	}
 }

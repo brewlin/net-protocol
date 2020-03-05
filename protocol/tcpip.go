@@ -103,6 +103,9 @@ var (
 	ErrNetworkUnreachable    = &Error{msg: "network is unreachable"}
 	ErrMessageTooLong        = &Error{msg: "message too long"}
 	ErrNoBufferSpace         = &Error{msg: "no buffer space available"}
+
+	ErrControlPortUnreachable = &Error{msg: "Destination unreachable (Port unreachable)"}
+	ErrControlPacketTooBig = &Error{msg: "control packet is too big"}
 )
 
 // Errors related to Subnet

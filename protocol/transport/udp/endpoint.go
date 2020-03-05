@@ -51,6 +51,14 @@ const (
 	stateClosed
 )
 
+//表示接受到了imcp控制消息
+type icmpState int
+
+const (
+	icmpNormal icmpState = iota
+	icmpRcv
+)
+
 // endpoint represents a UDP endpoint. This struct serves as the interface
 // between users of the endpoint and the protocol implementation; it is legal to
 // have concurrent goroutines make calls into the endpoint, they are properly
@@ -74,6 +82,10 @@ type endpoint struct {
 	rcvBufSize    int
 	rcvClosed     bool
 	rcvTimestamp  bool
+
+	//icmp control message notify
+	rcvIcmp    icmpState
+	rcvIcmpMsg *tcpip.Error
 
 	// The following fields are protected by the mu mutex.
 	mu           sync.RWMutex
@@ -131,6 +143,7 @@ func newEndpoint(stack *stack.Stack, netProto tcpip.NetworkProtocolNumber, waite
 		multicastTTL:  1,
 		rcvBufSizeMax: 32 * 1024,
 		sndBufSize:    32 * 1024,
+		rcvIcmp:       icmpNormal,
 	}
 }
 
@@ -205,6 +218,10 @@ func (e *endpoint) Read(addr *tcpip.FullAddress) (buffer.View, tcpip.ControlMess
 	// 如果接收链表为空，即没有任何数据
 	if e.rcvList.Empty() {
 		err := tcpip.ErrWouldBlock
+		//判断是否接受到了icmp 控制消息包
+		if e.rcvIcmp != icmpNormal {
+			err = e.rcvIcmpMsg
+		}
 		if e.rcvClosed {
 			err = tcpip.ErrClosedForReceive
 		}
@@ -381,7 +398,7 @@ func (e *endpoint) Write(p tcpip.Payload, opts tcpip.WriteOptions) (uintptr, <-c
 				// Link address needs to be resolved. Resolution was triggered the background.
 				// Better luck next time.
 				route.RemoveWaker(waker)
-				return 0, ch, tcpip.ErrNoLinkAddress
+				return 0, ch, err
 			}
 			return 0, nil, err
 		}
@@ -979,4 +996,15 @@ func (e *endpoint) HandlePacket(r *stack.Route, id stack.TransportEndpointID, vv
 
 // HandleControlPacket implements stack.TransportEndpoint.HandleControlPacket.
 func (e *endpoint) HandleControlPacket(id stack.TransportEndpointID, typ stack.ControlType, extra uint32, vv buffer.VectorisedView) {
+	log.Println("@传输层 udp: 接受处理ip层分发的icmp数据包")
+	// set the icmp control msg notice
+	e.rcvIcmp = icmpRcv
+	switch typ {
+	case stack.ControlPortUnreachable:
+		e.rcvIcmpMsg = tcpip.ErrControlPortUnreachable
+	case stack.ControlPacketTooBig:
+		e.rcvIcmpMsg = tcpip.ErrControlPacketTooBig
+	}
+	//trigger notify
+	e.waiterQueue.Notify(waiter.EventIn)
 }

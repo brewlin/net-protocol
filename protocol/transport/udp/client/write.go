@@ -10,7 +10,7 @@ func (c *Client) Write(buf []byte) error {
 	for{
 		_,ch,err := c.ep.Write(tcpip.SlicePayload(v),
 			tcpip.WriteOptions{To: &c.remote})
-		if err == tcpip.ErrNoLinkAddress {
+		if err == tcpip.ErrWouldBlock {
 			<-ch
 			continue
 		}

@@ -68,7 +68,7 @@ func (c *Client) connect(s *stack.Stack) error {
 		Port: uint16(c.port),
 	}
 	var wq waiter.Queue
-	//新建一个tcp端
+	//新建一个udp端
 	ep, err := s.NewEndpoint(udp.ProtocolNumber, ipv4.ProtocolNumber, &wq)
 	if err != nil {
 		log.Println(err)
@@ -82,19 +82,19 @@ func (c *Client) connect(s *stack.Stack) error {
 	c.ep = ep
 	terr := c.ep.Connect(c.remote)
 	if terr == tcpip.ErrConnectStarted {
-		log.Println("@传输层 tcp/client : Connect is pending...")
+		log.Println("@传输层 udp/client : Connect is pending...")
 		<-c.notifyC
 		terr = ep.GetSockOpt(tcpip.ErrorOption{})
 	}
 	if terr != nil {
-		log.Println("@传输层 tcp/client : Unable to connect: ", terr)
+		log.Println("@传输层 udp/client : Unable to connect: ", terr)
 		return terr
 	}
-	log.Println("@传输层 tcp/client:Connected")
+	log.Println("@传输层 udp/client:Connected")
 	return nil
 }
 func (c *Client) Close() {
 	c.queue.EventUnregister(&c.waitEntry)
 	c.ep.Close()
-	log.Println("@传输层 tcp/client :tcp disconnected")
+	log.Println("@传输层 udp/client :tcp disconnected")
 }

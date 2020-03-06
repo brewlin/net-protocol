@@ -5,7 +5,7 @@ import (
 	tcpip "github.com/brewlin/net-protocol/protocol"
 )
 //Write
-func (c *Client) Write(buf []byte) error {
+func (c *Client) Write(buf []byte) *tcpip.Error {
 	v := buffer.View(buf)
 	for{
 		_,ch,err := c.ep.Write(tcpip.SlicePayload(v),

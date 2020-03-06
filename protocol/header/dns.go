@@ -6,17 +6,32 @@ import (
 	"strings"
 )
 
-//DNSResourceType resource type 表示资源类型
-type DNSResourceType uint16
-
-//DNSop 表示dns header 操作码
-type DNSop uint16
 
 //ADCOUNT question 实体数量占2个字节
 //ANCOUNT answer   资源数量占2个字节
 //NSCOUNT authority 部分包含的资源数量 2byte
 //ARCOUNT additional 部分包含的资源梳理 2byte
 
+//DNSResourceType resource type 表示资源类型
+type DNSResourceType uint16
+
+const (
+	A  DNSResourceType = iota + 1 // name = hostname value = ipaddress
+	NS                            //name = ,value = dns hostname
+	MD
+	MF
+	CNAME //name = hostname
+	SOA
+	MB
+	MG
+	MR
+	NULL
+	WKS
+	PTR
+	HINFO
+	MINFO
+	MX
+)
 
 const (
 	ID = 0
@@ -24,64 +39,125 @@ const (
 	QDCOUNT = 4
 	ANCOUNT = 6
 	NSCOUNT = 8
-	QACOUNT = 10
+	ARCOUNT = 10
 
 	DOMAIN = 12
 )
-
+//DNSQuestion
 type DNSQuestion struct {
 	QuestionType  uint16
 	QuestionClass uint16
 }
 
+//DNSResource ansower,authority,additional
+type DNSResource struct {
+	Name uint16
+	Type DNSResourceType
+	Class uint16
+	TTL uint32
+	RDlen uint16
+	RData []byte
+	Address string
+}
+
+
 //DNS 报文的封装
 type DNS []byte
+
+//GetId
+func (d DNS) GetId() uint16 {
+	return binary.BigEndian.Uint16(d[ID:OP])
+}
+//GetQDCount
+func (d DNS) GetQDCount()uint16  {
+	return binary.BigEndian.Uint16(d[QDCOUNT:QDCOUNT+2])
+}
+//GetANCount
+func (d DNS) GetANCount()uint16{
+	return binary.BigEndian.Uint16(d[ANCOUNT:ANCOUNT + 2])
+}
+//GetNSCount
+func (d DNS) GetNSCount() uint16 {
+	return binary.BigEndian.Uint16(d[NSCOUNT:NSCOUNT + 2])
+}
+//GetQACount
+func (d DNS) GetARCount () uint16 {
+	return binary.BigEndian.Uint16(d[ARCOUNT:ARCOUNT + 2])
+}
+
+//GetAnswer
+func (d DNS) GetAnswer(domain string) *[]DNSResource {
+	//answer 起始地址
+	asLen := DOMAIN + len(d.getDomain(domain)) + 4
+
+	answer := []DNSResource{}
+	for i := 0; i < (int(d.GetANCount() + d.GetNSCount() + d.GetARCount())) ;i ++ {
+		rs := DNSResource{}
+		//判断是不是指针 pointer地址
+		if checkP := d[asLen]; checkP >> 6  == 3 {
+			//pointer := (d[asLen] & 0x3F << 8) + d[asLen+1]
+			rs.Name = binary.BigEndian.Uint16(d[asLen:asLen+2])
+			asLen += 2
+			rs.Type = DNSResourceType(binary.BigEndian.Uint16(d[asLen:asLen+2]))
+			asLen += 2
+			rs.Class = binary.BigEndian.Uint16(d[asLen:asLen+2])
+			asLen += 2
+			rs.TTL = binary.BigEndian.Uint32(d[asLen:asLen+4])
+			asLen += 4
+			rs.RDlen = binary.BigEndian.Uint16(d[asLen:asLen+2])
+			asLen += 2
+			rs.RData = d[asLen:asLen+int(rs.RDlen)]
+			asLen += int(rs.RDlen)
+			answer = append(answer,rs)
+		}
+	}
+	return &answer
+}
 
 //Setheader
 func (d DNS) Setheader(id uint16){
 	d.setID(id)
 	d.setFlag(0,0,0,0,1,0,0)
 }
-//SetID
+//SetCount
+func (d DNS) SetCount(qd,an,ns,qa uint16) {
+	//SetQdcount
+	binary.BigEndian.PutUint16(d[QDCOUNT:], qd)
+	//SetAncount
+	binary.BigEndian.PutUint16(d[ANCOUNT:] ,an)
+	//SetNscount
+	binary.BigEndian.PutUint16(d[NSCOUNT:],ns)
+	//SetQAcount
+	binary.BigEndian.PutUint16(d[ARCOUNT:],qa)
+}
+//setID
 func (d DNS)setID(id uint16){
 	//set id
 	binary.BigEndian.PutUint16(d[ID:], id)
 }
-//SetQdcount
-func (d DNS)SetQdcount(qd uint16){
-
-	binary.BigEndian.PutUint16(d[QDCOUNT:], qd)
-}
-//SetAncount
-func (d DNS)SetAncount(an uint16){
-	binary.BigEndian.PutUint16(d[ANCOUNT:] ,an)
-}
-//SetNscount
-func (d DNS)SetNscount(ns uint16){
-	binary.BigEndian.PutUint16(d[NSCOUNT:],ns)
-}
-//SetQAcount
-func (d DNS)SetQAcount(qa uint16){
-	binary.BigEndian.PutUint16(d[QACOUNT:],qa)
-}
-//SetDomain
-func (d *DNS)SetDomain(domain string) {
+//setDomain
+func (d *DNS)getDomain(domain string) []byte {
 	var (
 		buffer   bytes.Buffer
 		segments []string = strings.Split(domain, ".")
 	)
-	binary.Write(&buffer,binary.BigEndian,*d)
-
 	for _, seg := range segments {
 		binary.Write(&buffer, binary.BigEndian, byte(len(seg)))
 		binary.Write(&buffer, binary.BigEndian, []byte(seg))
 	}
 	binary.Write(&buffer, binary.BigEndian, byte(0x00))
 
-	*d = buffer.Bytes()
-	//return buffer.Bytes()
+	return buffer.Bytes()
 }
-func (d *DNS)SetQuestion(qtype,qclass uint16){
+//SetQuestion query field
+//domain url
+//qtype type
+//qclass class
+func (d *DNS)SetQuestion(domain string,qtype,qclass uint16){
+	for _,b := range d.getDomain(domain) {
+		*d = append((*d),b)
+	}
+	//d.setDomain(domain)
 	q := DNSQuestion{
 		QuestionType:  qtype,
 		QuestionClass: qclass,

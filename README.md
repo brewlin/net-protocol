@@ -16,7 +16,7 @@
 ## @application 应用层
 - [x] [http](http://wiki.brewlin.com/wiki/net-protocol/index/)
 - [x] [websocket](http://wiki.brewlin.com/wiki/net-protocol/index/)
-- [ ] [dns](http://wiki.brewlin.com/wiki/net-protocol/index/)
+- [x] [dns](http://wiki.brewlin.com/wiki/net-protocol/index/)
 
 
 ## @transport 传输层

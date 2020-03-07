@@ -136,7 +136,7 @@ func (d DNS)setID(id uint16){
 	//set id
 	binary.BigEndian.PutUint16(d[ID:], id)
 }
-//setDomain
+//getDomain
 func (d *DNS)getDomain(domain string) []byte {
 	var (
 		buffer   bytes.Buffer

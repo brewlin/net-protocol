@@ -15,7 +15,7 @@ func (e *Endpoint) parseResp() (*[]header.DNSResource,error){
 	}
 	p := header.DNS(rsp)
 	e.resp = &p
-	e.answer = p.GetAnswer(e.Domain)
+	e.answer = p.GetAnswer( )
 	return e.parseAnswer()
 }
 

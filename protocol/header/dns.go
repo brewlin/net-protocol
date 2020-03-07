@@ -86,9 +86,10 @@ func (d DNS) GetARCount () uint16 {
 }
 
 //GetAnswer
-func (d DNS) GetAnswer(domain string) *[]DNSResource {
+func (d DNS) GetAnswer( ) *[]DNSResource {
 	//answer 起始地址
-	asLen := DOMAIN + len(d.getDomain(domain)) + 4
+	//asLen := DOMAIN + len(d.getDomain(domain)) + 4
+	asLen := DOMAIN + d.GetDomainLen() + 4
 
 	answer := []DNSResource{}
 	for i := 0; i < (int(d.GetANCount() + d.GetNSCount() + d.GetARCount())) ;i ++ {
@@ -148,6 +149,18 @@ func (d *DNS)getDomain(domain string) []byte {
 	binary.Write(&buffer, binary.BigEndian, byte(0x00))
 
 	return buffer.Bytes()
+}
+//GetDomainLen 计算domain的长度字节数
+func (d DNS) GetDomainLen() (rs int) {
+	slen := DOMAIN
+	for{
+		rs += 1
+		if int(d[slen]) == 0 {
+			return rs
+		}
+		rs += int(d[slen])
+		slen += int(d[slen]) + 1
+	}
 }
 //SetQuestion query field
 //domain url

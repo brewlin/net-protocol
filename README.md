@@ -10,9 +10,9 @@
 基于go 实现链路层、网络层、传输层、应用层 网络协议栈 ，使用虚拟网卡实现
 ## @docs
 ```
-相关md文档在cmd目录下，以及相关协议的demo测试
+相关demo以及协议测试在cmd目录下
 ```
-`./cmd/*.md`
+`cd ./cmd/*`
 ## @application 应用层
 - [x] [http](http://wiki.brewlin.com/wiki/net-protocol/index/)
 - [x] [websocket](http://wiki.brewlin.com/wiki/net-protocol/index/)

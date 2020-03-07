@@ -8,7 +8,7 @@ import (
 
 func main() {
 	d := dns.NewEndpoint("www.baidu.com")
-			fmt.Println("DNS lookuphost    : www.baidu.com")
+	fmt.Println("DNS lookuphost    : www.baidu.com")
 	defer d.Close()
 
 	ir,err := d.Resolve();

@@ -7,8 +7,8 @@
   </p>
 
 
-基于go 实现链路层、网络层、传输层、应用层 网络协议栈 ，使用虚拟网卡实现
-## @docs
+基于go 实现链路层、网络层、传输层、应用层 网络协议栈 ，使用虚拟网卡实现 docs:http://wiki.brewlin.com/wiki/net-protocol/index/
+## @demo
 ```
 相关demo以及协议测试在cmd目录下
 ```
@@ -42,6 +42,7 @@
 - [x] [websocket client](http://wiki.brewlin.com/wiki/net-protocol/index/)
 - [x] [tcp client](http://wiki.brewlin.com/wiki/net-protocol/index/)
 - [x] [udp client](http://wiki.brewlin.com/wiki/net-protocol/index/)
+- [x] [dns client](http://wiki.brewlin.com/wiki/net-protocol/index/)
 ## 协议相关api
 ### 1.应用层相关协议
 应用层暂时只实现了`http`、`websocket`等文本协议。都基于tcp、对tcp等进行二次封装

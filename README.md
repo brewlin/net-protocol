@@ -46,46 +46,46 @@
 ## 协议相关构体
 具体细节文档:http://wiki.brewlin.com/wiki/net-protocol/index/
 ### 1.应用层相关协议
-应用层暂时只实现了`http`、`websocket`、`dns`等协议。都基于tcp、对tcp等进行二次封装
+应用层暂时只实现了`http`、`websocket`、`dns`协议。都基于tcp、udp等进行二次封装
 
 http protocol:
 ```
-	http 协议报文
-	GET /chat HTTP/1.1
-	Host: server.example.com
-	Upgrade: websocket
-	Connection: Upgrade
-	Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
-	Origin: http://example.com
-	Sec-WebSocket-Protcol: chat, superchat
-	Sec-WebSocket-Version: 13
+http 协议报文
+GET /chat HTTP/1.1
+Host: server.example.com
+Upgrade: websocket
+Connection: Upgrade
+Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==
+Origin: http://example.com
+Sec-WebSocket-Protcol: chat, superchat
+Sec-WebSocket-Version: 13
 ```
 websocket protocol:
 ```
-			websocket 数据帧报文
+  websocket 数据帧报文
 
-     0               1               2               3               4
-     0 1 2 3 4 5 6 7 8 1 2 3 4 5 6 7 8 1 2 3 4 5 6 7 8 1 2 3 4 5 6 7 8
-     +-+-+-+-+-------+-+-------------+-------------------------------+
-     |F|R|R|R| opcode|M| Payload len |    Extended payload length    |
-     |I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
-     |N|V|V|V|       |S|             |   (if payload len==126/127)   |
-     | |1|2|3|       |K|             |                               |
-     +-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
-     |     Extended payload length continued, if payload len == 127  |
-     + - - - - - - - - - - - - - - - +-------------------------------+
-     |                               |Masking-key, if MASK set to 1  |
-     +-------------------------------+-------------------------------+
-     | Masking-key (continued)       |          Payload Data         |
-     +-------------------------------- - - - - - - - - - - - - - - - +
-     :                     Payload Data continued ...                :
-     + - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
-     |                     Payload Data continued ...                |
-     +---------------------------------------------------------------+
+0               1               2               3               4
+0 1 2 3 4 5 6 7 8 1 2 3 4 5 6 7 8 1 2 3 4 5 6 7 8 1 2 3 4 5 6 7 8
++-+-+-+-+-------+-+-------------+-------------------------------+
+|F|R|R|R| opcode|M| Payload len |    Extended payload length    |
+|I|S|S|S|  (4)  |A|     (7)     |             (16/64)           |
+|N|V|V|V|       |S|             |   (if payload len==126/127)   |
+| |1|2|3|       |K|             |                               |
++-+-+-+-+-------+-+-------------+ - - - - - - - - - - - - - - - +
+|     Extended payload length continued, if payload len == 127  |
++ - - - - - - - - - - - - - - - +-------------------------------+
+|                               |Masking-key, if MASK set to 1  |
++-------------------------------+-------------------------------+
+| Masking-key (continued)       |          Payload Data         |
++-------------------------------- - - - - - - - - - - - - - - - +
+:                     Payload Data continued ...                :
++ - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - +
+|                     Payload Data continued ...                |
++---------------------------------------------------------------+
 
 ```
 ### 2.传输层相关协议
-传输层实现了`upd`、`tcp`、灯协议，并实现了主要接口
+传输层实现了`upd`、`tcp`、等协议，实现了主要接口
 
 tcp protocol:
 

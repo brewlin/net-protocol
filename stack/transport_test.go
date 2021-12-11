@@ -17,11 +17,11 @@ package stack_test
 import (
 	"testing"
 
-	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/pkg/buffer"
-	"github.com/brewlin/net-protocol/link/channel"
-	"github.com/brewlin/net-protocol/stack"
 	"github.com/brewlin/net-protocol/pkg/waiter"
+	tcpip "github.com/brewlin/net-protocol/protocol"
+	"github.com/brewlin/net-protocol/protocol/link/channel"
+	"github.com/brewlin/net-protocol/stack"
 )
 
 const (

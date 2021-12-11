@@ -20,13 +20,13 @@ import (
 	"testing"
 	"time"
 
-	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/pkg/buffer"
-	"github.com/brewlin/net-protocol/checker"
+	"github.com/brewlin/net-protocol/pkg/checker"
+	"github.com/brewlin/net-protocol/pkg/waiter"
+	tcpip "github.com/brewlin/net-protocol/protocol"
 	"github.com/brewlin/net-protocol/protocol/header"
 	"github.com/brewlin/net-protocol/protocol/transport/tcp"
 	"github.com/brewlin/net-protocol/protocol/transport/tcp/testing/context"
-	"github.com/brewlin/net-protocol/pkg/waiter"
 )
 
 // createConnectedWithTimestampOption creates and connects c.ep with the

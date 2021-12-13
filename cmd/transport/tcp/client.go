@@ -4,10 +4,13 @@ import (
 	"io/ioutil"
 	"log"
 	"net"
+	"strconv"
+
+	"github.com/brewlin/net-protocol/config"
 )
 
 func main() {
-	addr := "192.168.1.1:9111"
+	addr := config.LocalAddres.To4().String() + ":" + strconv.Itoa(int(config.LocalPort))
 	tcpaddr, err := net.ResolveTCPAddr("", addr)
 	if err != nil {
 		log.Fatal("net Resolvetcp addr error!", err.Error())

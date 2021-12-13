@@ -5,11 +5,11 @@ import (
 	"strings"
 )
 
-// InternalIP return internal ip.
-func InternalIP() string {
+// InternalInterfaces return internal ip && nic name.
+func InternalInterfaces() (ip, nic string) {
 	inters, err := net.Interfaces()
 	if err != nil {
-		return ""
+		return "", ""
 	}
 	for _, inter := range inters {
 		if !strings.HasPrefix(inter.Name, "lo") {
@@ -20,11 +20,11 @@ func InternalIP() string {
 			for _, addr := range addrs {
 				if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 					if ipnet.IP.To4() != nil {
-						return ipnet.IP.String()
+						return ipnet.IP.String(), inter.Name
 					}
 				}
 			}
 		}
 	}
-	return ""
+	return "", ""
 }

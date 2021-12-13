@@ -8,11 +8,17 @@
 
 
 基于go 实现链路层、网络层、传输层、应用层 网络协议栈 ，使用虚拟网卡实现 docs:http://wiki.brewlin.com/wiki/net-protocol/index/
-## @demo
+## @demo && test
+相关demo以及协议测试在cmd目录下,`cd ./cmd*`
+
+docker
 ```
-相关demo以及协议测试在cmd目录下
+> docker run -d --device /dev/net/tun:/dev/net/tun --privileged brewlin/net-protocol
+> docker exec -it containerid /bin/bash
+> go run cmd/transport/udp/server/main.go
+> go run cmd/transport/udp/net_client.go
+
 ```
-`cd ./cmd/*`
 ## @application 应用层
 - [x] [http](http://wiki.brewlin.com/wiki/net-protocol/index/)
 - [x] [websocket](http://wiki.brewlin.com/wiki/net-protocol/index/)

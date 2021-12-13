@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"log"
+
 	"github.com/brewlin/net-protocol/config"
 	"github.com/brewlin/net-protocol/internal/endpoint"
 	"github.com/brewlin/net-protocol/pkg/logging"
@@ -9,7 +11,6 @@ import (
 	"github.com/brewlin/net-protocol/protocol/network/ipv4"
 	"github.com/brewlin/net-protocol/protocol/transport/udp"
 	"github.com/brewlin/net-protocol/stack"
-	"log"
 
 	tcpip "github.com/brewlin/net-protocol/protocol"
 )
@@ -51,9 +52,12 @@ func echo(s *stack.Stack) {
 			}
 			return
 		}
-		fmt.Printf("@main :read and write data:%s", string(v))
+		fmt.Printf("@main :read and write data:%s %v", string(v), saddr)
 		_, _, err = ep.Write(tcpip.SlicePayload(v), tcpip.WriteOptions{To: &saddr})
-		if err != nil {
+		if err == tcpip.ErrWouldBlock {
+			<-notifych
+		}
+		if err != nil && err != tcpip.ErrWouldBlock {
 			log.Fatal(err)
 		}
 	}

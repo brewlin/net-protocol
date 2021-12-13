@@ -1,10 +1,11 @@
 package stackinit
 
 import (
-	"github.com/brewlin/net-protocol/config"
 	"log"
 	"net"
 	"strings"
+
+	"github.com/brewlin/net-protocol/config"
 
 	"github.com/brewlin/net-protocol/protocol/link/fdbased"
 	"github.com/brewlin/net-protocol/protocol/link/tuntap"
@@ -21,8 +22,12 @@ import (
 //SetRoute 设置该路由信息
 func AddRoute(addr tcpip.Address) {
 	//未配置， 则自动随机获取网卡ipv4地址
+	firstIp, firstNic := ipv4.InternalInterfaces()
 	if config.HardwardIp == "" {
-		config.HardwardIp = ipv4.InternalIP()
+		config.HardwardIp = firstIp
+	}
+	if config.HardwardName == "" {
+		config.HardwardName = firstNic
 	}
 	//添加默认路由
 	stack.Pstack.AddRouteTable(tcpip.Route{

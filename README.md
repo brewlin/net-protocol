@@ -7,7 +7,7 @@
   </p>
 
 
-基于go 实现链路层、网络层、传输层、应用层 网络协议栈 ，使用虚拟网卡实现 docs:http://wiki.brewlin.com/wiki/net-protocol/index/
+基于go 实现链路层、网络层、传输层、应用层 网络协议栈 ，使用虚拟网卡实现 docs: https://wiki.brewlin.com/wiki/github/net-protocol/index/
 ## @demo && test
 相关demo以及协议测试在cmd目录下,`cd ./cmd*`
 
@@ -20,37 +20,37 @@ docker
 
 ```
 ## @application 应用层
-- [x] [http](http://wiki.brewlin.com/wiki/net-protocol/index/)
-- [x] [websocket](http://wiki.brewlin.com/wiki/net-protocol/index/)
-- [x] [dns](http://wiki.brewlin.com/wiki/net-protocol/index/)
+- [x] [http](https://wiki.brewlin.com/wiki/github/net-protocol/index/)
+- [x] [websocket](http://wiki.brewlin.com/wiki/github/net-protocol/index/)
+- [x] [dns](http://wiki.brewlin.com/wiki/github/net-protocol/index/)
 
 
 ## @transport 传输层
-- [x] [tcp](http://wiki.brewlin.com/wiki/net-protocol/index/)
-- [x] [udp](http://wiki.brewlin.com/wiki/net-protocol/index/)
-- [x] [port](http://wiki.brewlin.com/wiki/net-protocol/index/) 端口机制 
+- [x] [tcp](http://wiki.brewlin.com/wiki/github/net-protocol/index/)
+- [x] [udp](http://wiki.brewlin.com/wiki/github/net-protocol/index/)
+- [x] [port](http://wiki.brewlin.com/wiki/github/net-protocol/index/) 端口机制 
 
 ## @network 网络层
-- [x] [icmp](http://wiki.brewlin.com/wiki/net-protocol/index/)
-- [x] [ipv4](http://wiki.brewlin.com/wiki/net-protocol/index/)
-- [x] [ipv6](http://wiki.brewlin.com/wiki/net-protocol/index/)
+- [x] [icmp](http://wiki.brewlin.com/wiki/github/net-protocol/index/)
+- [x] [ipv4](http://wiki.brewlin.com/wiki/github/net-protocol/index/)
+- [x] [ipv6](http://wiki.brewlin.com/wiki/github/net-protocol/index/)
 
 ## @link 链路层
-- [x] [arp](http://wiki.brewlin.com/wiki/net-protocol/index/)
-- [x] [ethernet](http://wiki.brewlin.com/wiki/net-protocol/index/) 
+- [x] [arp](http://wiki.brewlin.com/wiki/github/net-protocol/index/)
+- [x] [ethernet](http://wiki.brewlin.com/wiki/github/net-protocol/index/) 
 
 ## @物理层
-- [x] tun [tap](http://wiki.brewlin.com/wiki/net-protocol/index/) 虚拟网卡的实现
+- [x] tun [tap](http://wiki.brewlin.com/wiki/github/net-protocol/index/) 虚拟网卡的实现
 
 ## @客户端
 发起客户端请求
-- [x] [http client](http://wiki.brewlin.com/wiki/net-protocol/index/)
-- [x] [websocket client](http://wiki.brewlin.com/wiki/net-protocol/index/)
-- [x] [tcp client](http://wiki.brewlin.com/wiki/net-protocol/index/)
-- [x] [udp client](http://wiki.brewlin.com/wiki/net-protocol/index/)
-- [x] [dns client](http://wiki.brewlin.com/wiki/net-protocol/index/)
+- [x] [http client](http://wiki.brewlin.com/wiki/github/net-protocol/index/)
+- [x] [websocket client](http://wiki.brewlin.com/github/wiki/net-protocol/index/)
+- [x] [tcp client](http://wiki.brewlin.com/wiki/github/net-protocol/index/)
+- [x] [udp client](http://wiki.brewlin.com/wiki/github/net-protocol/index/)
+- [x] [dns client](http://wiki.brewlin.com/wiki/github/net-protocol/index/)
 ## 协议相关构体
-具体细节文档:http://wiki.brewlin.com/wiki/net-protocol/index/
+具体细节文档:http://wiki.brewlin.com/wiki/github/net-protocol/index/
 ### 1.应用层相关协议
 应用层暂时只实现了`http`、`websocket`、`dns`协议。都基于tcp、udp等进行二次封装
 
